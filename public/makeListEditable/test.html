@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dragOrDeleteListTest</title>
+<link href="./makeListEditable-bak.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+
+<ol id="drag-n-delete-list" class="draggable_list_items deletable_list_items">
+  <li><span>not draggable A</span></li>
+  <li><span>not draggable B</span></li>
+  <li><span>not draggable C</span></li>
+  <li><span>not draggable D</span></li>
+  <li><span>not draggable E</span></li>
+</ol>
+
+
+<script type="text/javascript" src="./makeListEditable.js"></script>
+
+<script>
+makeListEditable(document.getElementById('drag-n-delete-list'))
+</script>
+
+</body>
+</html>
+
+

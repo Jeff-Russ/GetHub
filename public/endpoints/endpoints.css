@@ -1,0 +1,157 @@
+#endpoints {
+	position: relative;
+	display: inline-block;
+
+	height:auto;
+	width: auto;
+}
+
+
+
+#endpoints-menu {
+	position: relative;
+	display: block;
+	overflow-y:scroll;
+	height:auto;
+	width: auto;
+	border: 1px solid #6494b6;
+	border-radius: 8px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-right: 8px;
+}
+
+
+#endpointGET button#endpointGET-submit {
+	/* move submit button to right of #endpointGET container */
+	position: relative;
+	float:right;
+	background-color : #707070;  /* default button color */
+	border-radius: 5px;
+	border-width: 0px;
+	margin-right: 0;
+}
+
+#endpointGET-ol span[contenteditable] {
+	border: 1px solid #799de0;
+	color: #a6c1f4;
+	background-color: black;
+}
+
+
+#endpointGET-ol {
+	/* prevent ugly empty space on left of #endpointGET container due to ul */
+	padding-inline-start: 30px; /*overrides user agent stylesheet (40px) */
+} 
+
+
+#endpointGET-ol > li {
+	white-space: pre; /* not working? was it already pre? */
+	cursor: pointer;
+}
+
+
+
+/* If there are no li we hide button: */
+#endpointGET:has(ol:empty) button { 
+	display: none;
+}
+
+#endpointGET:has(ol:empty):before { 
+	content: "\00a0\00a0 click and endpoint to add it here and, if needed, edit path segments.";
+}
+
+
+/* If there are li, we show button */
+#endpointGET:has(ol:has(li)) button {  
+	display: inline-block;
+}
+
+
+
+#endpoints-menu button {
+	background-color : #707070;  /* default button color */
+	border-radius: 5px;
+	border-width: 0px;
+	margin-right: 0;
+}
+
+#endpointGET {
+	position: relative;
+	display: inline-block;
+	height: auto;
+	width: auto;
+	/* border: 2px solid #6494b6; */
+	background-color: #2f485a;
+	border-radius: 8px;
+	padding: 0 20px 10px 0;
+	margin: 10px;
+}
+
+
+/* hide the fact that we have a list when only one li */
+#endpointGET-ol:has(li:only-of-type) {
+	
+	list-style: none; 
+}
+
+/* If there is only one li, we will hide the li number
+  What is -1? It makes first item be 0 because 1 -1 = 0 */
+#endpointGET-ol:not(:has(li:only-of-type)) { 
+	counter-reset: endpointGET_li_counter -1; 
+	list-style-type: none;
+}
+
+/* #endpointGET-ol li { display: block; } */
+#endpointGET-ol:not(:has(li:only-of-type)) li:before { 
+	content: counter(endpointGET_li_counter) " "; 
+	counter-increment: endpointGET_li_counter;
+	float: left;
+}
+
+#endpoints-menu ul {
+	padding-left: 14px;
+}
+#endpoints-menu li {
+	padding: 0px;
+	margin: 0px;
+}
+
+
+#endpoints-menu:not(#endpoint-selected-mode) > ul > li > ul,
+#endpoints-menu:not(#endpoint-selected-mode) > ul > li > ul > li > ul {
+	display:none;
+}
+
+
+#endpoints-menu > ul > li:hover > ul, 
+#endpoints-menu > ul > li:focus-within > ul,
+#endpoints-menu > ul > li > ul > li:hover > ul, 
+#endpoints-menu > ul > li > ul > li:focus-within > ul  {
+	display:block;
+}
+
+/* hovered / navigated button color */
+#endpoints-menu > ul > li:hover > button, 
+#endpoints-menu > ul > li:focus-within > button,
+#endpoints-menu > ul > li > ul > li:hover > button, 
+#endpoints-menu > ul > li > ul > li:focus-within > button {
+	background-color: #6494b6;
+}
+
+
+/* THE selected button color */
+#endpoints-menu > ul > li > ul > li > ul > li > button#endpoint-selected {
+	background-color: #64b67b;
+}
+
+
+
+
+
+
+
+
+
+
+

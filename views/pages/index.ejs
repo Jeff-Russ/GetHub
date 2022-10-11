@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="/css/dark-layout.bak.css" rel="stylesheet" type="text/css">
+  <link href="/endpoints/endpoints.bak.css" rel="stylesheet" type="text/css">
+  <link href="makeListEditable/makeListEditable.bak.css" rel="stylesheet" type="text/css">
+
+  <title>GetHub — Query the GitHub API</title>
+  <style>
+    
+    #endpointGET-ol > li{
+      line-height: 1.4em;
+    }
+
+    #endpointGET-ol span.endpoint {
+      border: 1px solid black;
+    }
+    #endpointGET-ol a {
+      float: right;
+    }
+
+
+    a[target="_blank"] {
+      color: black;
+      background-color: #50607c;
+    }
+
+    a[target="_blank"]::after {
+      content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+      margin: 0 0px 0 0px;
+      background-color: #50607c;
+      padding: 0.5px 1px;
+      border-radius: 3px;
+    }
+
+    /* below: same as for div#endpoints-menu button */
+    /* below: background-color is default button color */ 
+    #api-response button { 
+      background-color : #707070;  
+      color: #070a0c;
+      padding: 0px;
+      margin: 0.5px;
+      border-radius: 5px;
+      border-width: 0px;
+    }
+
+    #api-response span.object:not(.syntax) > span:first-of-type {
+      display: none;
+    }
+    #api-response span.object:not(.syntax) > span:last-of-type {
+      display: none;
+    }
+    
+
+
+    /* #api-response a.api-endpoint.valid { } */
+    /* #api-response a.api-endpoint.template { } */
+    /* #api-response a.other-url.valid { } */
+
+
+  </style>
+</head>
+<body>
+
+<div id="endpoints">
+  <div id="endpoints-menu" class="picker">
+    <h2 style="margin:0">&nbsp;GitHub API GET Endpoints</h2>
+    <ul>
+  <% data_endpoints_json.forEach(category => { -%>
+  <%   const cat_key = Object.keys(category)[0] -%>
+      <li><button class="picker-menu-btn"><strong><%= cat_key %></strong></button>
+        <ul>
+  <%   category[cat_key].forEach(subcategory => { -%>
+  <%     const subcat_key = Object.keys(subcategory)[0] -%>
+  <%     const [subcat_name, subcat_link] = subcat_key.split(': ') -%>
+          <li><button class="picker-submenu-btn"><%= subcat_name %></button>&nbsp<a href="<%= subcat_link %>" target="_blank">docs</a>
+            <ul>
+  <%     subcategory[subcat_key].forEach(entry => { -%>
+  <%       const entry_endpoint = Object.keys(entry)[0] -%>
+  <%       const entry_link = entry[entry_endpoint] -%>
+  <%       const quoted_api_valid_url_re = /^[^{}]+$/i // see quoted_api_valid_url_re -%>
+  <%        const is_template = !entry_endpoint.match(quoted_api_valid_url_re) ? 'template' : 'valid' -%>
+  <%       // console.log(`${entry_endpoint} is ${is_template}`) -%>
+              <li>
+                <button class="picker-select-btn api-endpoint <%= is_template %>"></code><%= entry_endpoint %></button>&nbsp
+                <a href="<%= entry_link %>" target="_blank"></a>
+              </li>
+  <%     }) -%>
+            </ul>
+          </li>
+  <%   }) -%>
+        </ul>
+      </li>
+  <% }) -%>
+    </ul>
+  </div>
+  <div style="float: right;">
+    <input >
+  </div>
+  <div id="endpointGET" > 
+    <!-- <li> will  be inserted and later on, each will have some filter rules -->
+    <ol id="endpointGET-ol"></ol>
+    <br>
+    <button onclick="submitMe('test')" id="endpointGET-submit" style="border: 0.5px solid #64b67b;">
+      <strong><code >GET</code></strong>
+    </button>
+  </div>
+
+</div>
+
+<div id="api-response" class="data-linkify">
+</div>
+
+
+
+<script type="text/javascript" src="js/helpers.bak.js"></script>
+<script type="text/javascript" src="endpoints/endpoints.bak.js"></script>
+<script type="text/javascript" src="api-response/renderjson.bak.js"></script>
+<script type="text/javascript" src="api-response/linkify.bak.js"></script>
+<script type="text/javascript" src="makeListEditable/makeListEditable.bak.js"></script>
+<script type="text/javascript">
+
+
+const endpointPreview = (endpoint) => 
+  `<a class="endpoint-preview" href="https://api.github.com${endpoint}" target="_blank"><a>`
+
+function clickApiEndpointValid(btn) {
+  const endpoint = btn.innerText;
+  console.log(`clickApiEndpointValid on "${endpoint}"`)
+  const endpointGET_ol = document.getElementById('endpointGET-ol')
+  const endpoint_preview = endpointPreview(endpoint)
+  console.log(endpoint_preview)
+  endpointGET_ol.insertAdjacentHTML( 'beforeend', `<li><span class="endpoint">${endpoint}<span contenteditable>?</span></span>${endpoint_preview}</li>` );
+  makeListEditable(endpointGET_ol)
+}
+
+function clickApiEndpointTemplate(btn) {
+  const endpoint = btn.innerText.replace(/{([^a-zA-Z0-9+])/, '$1{');
+  console.log(`clickApiEndpointTemplate on "${endpoint}"`)
+  const endpoint_html = endpoint.split(/(\{.*?\})/g).reduce(
+    (a,s)=> (s[0] !== '{' ? a+s : `${a}<span contenteditable orig=${s}>${s}</span>`),
+    ''
+  );
+  const endpoint_preview = endpointPreview(endpoint)
+  console.log(endpoint_preview)
+  const endpointGET_ol = document.getElementById('endpointGET-ol')
+  endpointGET_ol.insertAdjacentHTML( 'beforeend', `<li><span class="endpoint">${endpoint_html}<span contenteditable>?</span></span>${endpoint_preview}</li>` );
+  makeListEditable(endpointGET_ol)
+  
+}
+
+
+function handleClickApiEndpointValid(event) {
+  console.log('handleClickApiEndpointValid')
+  clickApiEndpointValid(event.target)
+}
+function handleClickApiEndpointTemplate(event) {
+  console.log('handleClickApiEndpointTemplate')
+  clickApiEndpointTemplate(event.target)  
+}
+
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  makeEndpointsMenuCollapsible()
+  setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemplate)
+  makeListEditable(document.getElementById('endpointGET-ol'))
+
+  async function fetchGET(url) {
+    const res = await fetch(url)
+    return res.ok ? res.json() : Promise.reject(new Error(res.status));
+  }
+
+  var prev_json = ''
+  
+  fetchGET('https://api.github.com/users/edx/repos')
+    .then(json => {
+      if (json !== prev_json) {
+        renderjson.set_icons("▶ expand ", "collapse ▼")
+        renderjson.set_show_to_level(1)
+        const api_response_el = document.getElementById("api-response")
+        api_response_el.innerHTML = '';
+        api_response_el.appendChild(renderjson(objectifyArray(json)));
+
+        linkify(handleClickApiEndpointValid, handleClickApiEndpointTemplate);
+        
+        // const endpoint_buttons = api_response_el.querySelectorAll('button.api-endpoint');
+        // // console.log(endpoint_buttons);
+        // [].forEach.call(endpoint_buttons, addEndpointSelectionListener);
+        
+      }
+    })
+    .catch(error => { console.log(`Error: ${error.message}`); });
+
+});
+  
+</script>
+</body>
+</html>

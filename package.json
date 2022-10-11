@@ -1,0 +1,25 @@
+{
+  "name": "gethub",
+  "version": "0.0.1",
+  "description": "Flexible and easy web-based tool for querying GitHub REST API (GET) endpoints",
+  "main": "app.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start_old": "NODE_PATH=$(npm root -g) node api-github-com-https.js",
+    "dev-old": "NODE_PATH=$(npm root -g) nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.20",
+    "octokit": "^2.0.7",
+    "yaml": "^2.1.1"
+  }
+}

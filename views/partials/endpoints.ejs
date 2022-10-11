@@ -1,0 +1,32 @@
+<div id="endpoints">
+  <div id="endpoints-menu" class="picker">
+    <h2 style="margin:0">&nbsp;GitHub API GET Endpoints</h2>
+    <ul>
+  <%data_endpoints_json.forEach(category => { -%>
+    <%const cat_key = Object.keys(category)[0] -%>
+      <li><button class="picker-menu-btn"><strong><%= cat_key %></strong></button>
+        <ul>
+    <%category[cat_key].forEach(subcategory => { -%>
+    <%  const subcat_key = Object.keys(subcategory)[0] -%>
+    <%  const [subcat_name, subcat_link] = subcat_key.split(': ') -%>
+          <li><button class="picker-submenu-btn"><%= subcat_name %></button>&nbsp<a href="<%= subcat_link %>" target="_blank">docs</a>
+            <ul>
+    <%  subcategory[subcat_key].forEach(entry => { -%>
+      <%  const entry_endpoint = Object.keys(entry)[0] -%>
+      <%  const entry_link = entry[entry_endpoint] -%>
+      <%  const quoted_api_valid_url_re = /^[^{}]+$/i // see quoted_api_valid_url_re -%>
+      <%   const is_template = !entry_endpoint.match(quoted_api_valid_url_re) ? 'template' : 'valid' -%>
+              <li>
+                <button class="picker-select-btn api-endpoint <%= is_template %>"></code><%= entry_endpoint %></button>&nbsp
+                <a href="<%= entry_link %>" target="_blank"></a>
+              </li>
+    <%  }) -%>
+            </ul>
+          </li>
+    <%}) -%>
+        </ul>
+      </li>
+  <%}) -%>
+    </ul>
+  </div>
+</div>
