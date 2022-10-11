@@ -7,8 +7,9 @@ gh-api-token.js
 data/endpoints-unordered.json
 data/endpoints.md
 
-Notes-and-studies/regex_archived/
-Notes-and-studies/octokit.txt
+Notes-and-studies/
+# Notes-and-studies/regex_archived/
+# Notes-and-studies/octokit.txt
 
 public/endpoints/endpoints-data-oldest.json
 public/endpoints/endpoints-old-unodered.json
