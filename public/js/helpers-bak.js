@@ -46,12 +46,11 @@ function objectifyArray (obj_or_arr) {
 //   console.log(func)
 //   return func;
 // }
-function String_interplate_demo() {
-  let template = 'Example text: ${text}';
-  let text = 'Foo Boo'
-  return template.interpolate({ text });
-}
-
+// function String_interplate_demo() {
+//   let template = 'Example text: ${text}';
+//   let text = 'Foo Boo'
+//   return template.interpolate({ text });
+// }
 
 
 function interpolate(string, params) {
@@ -83,6 +82,33 @@ function interplate_demo() {
   return interpolate(template, { text });
 }
 
+/**
+ * DANGER: NOT DONE AND NOT WORKING! This is intended to be a sandboxed "jail" function
+ * @param {string} callable 
+ * @param {object} params to be passed to callable
+ * @returns 
+ */
+function callWithParams(callable, params) {
+  const names = Object.keys(params);
+  const vals = Object.values(params);
+  const func = new Function(`return ${callable(...params)};`)(...params);
+  /* 
+  if called with ("A string with ${variable}" {variable: "value"})
+  new Function(...names, `return \`${string}\`;`)
+  is:
+  function anonymous(variable) {
+    return `A string with ${variable}`;
+  }
+  and returning it with (...vals) means it is self executing,
+  and a lot like this:
+
+  (function(variable){
+    return `A string with ${variable}`;
+  })("value");
+
+  */
+  return func;
+}
 
 /**
 * parseJSONLike is a more lax version of JSON.parse, allowing for single and backtick quotes in 
@@ -197,5 +223,99 @@ function parseJSONLike_Test(json) {
 }
 
 
+function flashContentAndCSSClass(element, temp_content, temp_css_class, ms=1000) {
+  const original_text = element.innerHTML
+
+  if (temp_content) {
+    element.innerHTML = temp_content
+  }
+  if (temp_css_class) {
+    element.classList.add(temp_css_class);
+  }
+  setTimeout(()=>{
+    if (temp_content) {
+      element.innerHTML = original_text
+    }
+    if (temp_css_class) {
+      element.classList.remove(temp_css_class);
+    }
+  }, ms)
+
+}
+
+function appendParentWithMessage(element, message) {
+  const parent_node = element.parentNode
+  parent_node.querySelectorAll('.appendParentWithMessage').forEach(e => {
+    console.log(`removing ${e}`)
+    e.remove()
+  })
+  const error_message = document.createElement("div");
+  const textnode = document.createTextNode(message);
+  error_message.classList.add('appendParentWithMessage');
+  error_message.appendChild(textnode);
+  parent_node.appendChild(error_message);
+}
+
+function unappendParentMessage(element) {
+  const parent_node = element.parentNode
+  parent_node.querySelectorAll('.appendParentWithMessage').forEach(e => {
+    console.log(`removing ${e}`)
+    e.remove()
+  })
+}
+
+
+function resizeElementToContents(element, extra_height=2, extra_width=2) {
+  /* suggested use: add to tag: onkeyup="resizeElementToContents(this)"
+    or 
+    document.getElementById('textArea').addEventListener('keyup', (event) => {
+      resizeElementToContents(event.target)
+    });
+    document.getElementById('textArea').addEventListener('keydown', (event) => {
+      setTimeout(()=>resizeElementToContents(event.target), 20)
+    });
+  */
+  element.style.height = "1px";
+  element.style.height = (extra_height+element.scrollHeight)+"px";
+  element.style.width = "1px";
+  element.style.width = (extra_width+element.scrollWidth)+"px";
+}
+
+function resizeElementWhileTyping(element, extra_height=2, extra_width=2) {
+  element.addEventListener('keydown', (event) => {
+    setTimeout(()=>resizeElementToContents(event.target, extra_height, extra_width), 20)
+  });
+}
+
+
+
+  
+
+function saveAndLoadPageState(element_id) {
+  // https://gist.github.com/jhammann/6000755
+
+  var content = document.getElementById('element_id');
+
+  // this line isn't really necessary here but you have to append this attribute to the element you want the html stored of.
+  content.setAttribute("contenteditable", "true")
+
+  // save the page's state after you're done with editing and clicked outside the content
+  content.addEventListener("blur", () => {
+    console.log("in blur")
+    localStorage.setItem('page_html', this.innerHTML);
+  });
+
+  // pretty logical, getItem retrieves your local storage data
+  if (localStorage.getItem('page_html')) {
+    content.innerHTML = localStorage.getItem('page_html');
+  }
+
+
+  // this function resets the localstorage and thus resets the page back to it's original state.
+  saveAndLoadPageState.reset = function (){
+    localStorage.clear();
+    window.location = window.location;
+  }
+}
 
 

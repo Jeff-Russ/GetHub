@@ -1,0 +1,17 @@
+/* below: same as for div#endpoints-menu button */
+/* below: background-color is default button color */ 
+#api-response button { 
+  background-color : #707070;  
+  color: #070a0c;
+  padding: 0px;
+  margin: 0.5px;
+  border-radius: 5px;
+  border-width: 0px;
+}
+
+#api-response span.object:not(.syntax) > span:first-of-type {
+  display: none;
+}
+#api-response span.object:not(.syntax) > span:last-of-type {
+  display: none;
+}

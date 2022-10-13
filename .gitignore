@@ -6,23 +6,11 @@ gh-api-token.js
 
 data/endpoints-unordered.json
 data/endpoints.md
-
 Notes-and-studies/
-# Notes-and-studies/regex_archived/
-# Notes-and-studies/octokit.txt
-
-public/endpoints/endpoints-data-oldest.json
-public/endpoints/endpoints-old-unodered.json
-public/json/github-old.json
-public/json/test.json
-public/endpoints.html
-public/readme.md
-public/page.html
-
+public/parseJSONLike_test.html
 z_old/
+jail-test.js
 
-api-github-com-https.js
-temp.out.js
 
 ### NODE ###
 

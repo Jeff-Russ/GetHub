@@ -5,64 +5,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="/css/dark-layout-bak.css" rel="stylesheet" type="text/css">
-  <link href="/endpoints/endpoints-bak.css" rel="stylesheet" type="text/css">
-  <link href="makeListEditable/makeListEditable-bak.css" rel="stylesheet" type="text/css">
+  <link href="styles/page-styles.css" rel="stylesheet" type="text/css">
+  <link href="styles/endpoints.css" rel="stylesheet" type="text/css">
+  <link href="styles/makeListEditable.css" rel="stylesheet" type="text/css">
+  <link href="styles/api-response.css" rel="stylesheet" type="text/css">
 
   <title>GetHub — Query the GitHub API</title>
-  <style>
-    
-    #endpointGET-ol > li{
-      line-height: 1.4em;
-    }
-
-    #endpointGET-ol span.endpoint {
-      border: 1px solid black;
-    }
-    #endpointGET-ol a {
-      float: right;
-    }
-
-
-    a[target="_blank"] {
-      color: black;
-      background-color: #50607c;
-    }
-
-    a[target="_blank"]::after {
-      content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
-      margin: 0 0px 0 0px;
-      background-color: #50607c;
-      padding: 0.5px 1px;
-      border-radius: 3px;
-    }
-
-    /* below: same as for div#endpoints-menu button */
-    /* below: background-color is default button color */ 
-    #api-response button { 
-      background-color : #707070;  
-      color: #070a0c;
-      padding: 0px;
-      margin: 0.5px;
-      border-radius: 5px;
-      border-width: 0px;
-    }
-
-    #api-response span.object:not(.syntax) > span:first-of-type {
-      display: none;
-    }
-    #api-response span.object:not(.syntax) > span:last-of-type {
-      display: none;
-    }
-    
-
-
-    /* #api-response a.api-endpoint.valid { } */
-    /* #api-response a.api-endpoint.template { } */
-    /* #api-response a.other-url.valid { } */
-
-
-  </style>
+ 
 </head>
 <body>
 
@@ -98,9 +47,7 @@
   <% }) -%>
     </ul>
   </div>
-  <div style="float: right;">
-    <input >
-  </div>
+  
   <div id="endpointGET" > 
     <!-- <li> will  be inserted and later on, each will have some filter rules -->
     <ol id="endpointGET-ol"></ol>
@@ -114,8 +61,6 @@
 
 <div id="api-response" class="data-linkify">
 </div>
-
-
 
 <script type="text/javascript" src="js/helpers-bak.js"></script>
 <script type="text/javascript" src="endpoints/endpoints-bak.js"></script>

@@ -1,0 +1,143 @@
+#endpoints {
+  position: relative;
+  display: inline-block;
+  height: auto;
+  width: auto;
+}
+
+#endpoints > #endpoints-menu {
+  position: relative;
+  display: block;
+  overflow-y: scroll;
+  height: auto;
+  width: auto;
+  border: 1px solid #6494b6;
+  border-radius: 8px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-right: 8px;
+}
+
+#endpoints > #endpointGET {
+  position: relative;
+  display: inline-block;
+  height: auto;
+  width: auto;
+  /* border: 2px solid #6494b6; */
+  background-color: #2f485a;
+  border-radius: 8px;
+  padding: 0 20px 10px 0;
+  margin: 10px;
+}
+
+#endpoints-menu button {
+  /* default button color */
+  background-color: #707070;
+  border-radius: 5px;
+  border-width: 0px;
+  margin-right: 0;
+}
+
+#endpoints-menu ul {
+  padding-left: 14px;
+}
+
+#endpoints-menu li {
+  padding: 0px;
+  margin: 0px;
+}
+
+#endpoints-menu:not(#endpoint-selected-mode) > ul > li > ul,
+#endpoints-menu:not(#endpoint-selected-mode) > ul > li > ul > li > ul {
+  display: none;
+}
+
+#endpoints-menu > ul > li:hover > ul,
+#endpoints-menu > ul > li:focus-within > ul,
+#endpoints-menu > ul > li > ul > li:hover > ul,
+#endpoints-menu > ul > li > ul > li:focus-within > ul {
+  display: block;
+}
+
+#endpoints-menu > ul > li:hover > button,
+#endpoints-menu > ul > li:focus-within > button,
+#endpoints-menu > ul > li > ul > li:hover > button,
+#endpoints-menu > ul > li > ul > li:focus-within > button {
+  /* hovered / navigated button color */
+  background-color: #6494b6;
+}
+
+#endpoints-menu > ul > li > ul > li > ul > li > button#endpoint-selected {
+  /* THE selected button color */
+  background-color: #64b67b;
+}
+
+#endpointGET button#endpointGET-submit {
+  /* move submit button to right of #endpointGET container */
+  position: relative;
+  float: right;
+  background-color: #707070; /* default button color */
+  border-radius: 5px;
+  border-width: 0px;
+  margin-right: 0;
+}
+
+#endpointGET:has(ol:empty) button {
+  /* If there are no li we hide button: */
+  display: none;
+}
+
+#endpointGET:has(ol:empty):before {
+  /* click and endpoint to add it here and, if needed, edit path segments."; */
+  content: "\00a0\00a0 click an endpoint to add it here and, if needed, edit path segments.";
+}
+
+#endpointGET:has(ol:has(li)) button {
+  /* If there are li, we show button */
+  display: inline-block;
+}
+
+#endpointGET-ol span[contenteditable] {
+  border: 1px solid #799de0;
+  color: #a6c1f4;
+  background-color: black;
+}
+
+#endpointGET-ol {
+  /* prevent ugly empty space on left of #endpointGET container due to ul */
+  padding-inline-start: 30px; /*overrides user agent stylesheet (40px) */
+}
+
+#endpointGET-ol > li {
+  /* not working? was it already pre? */
+  white-space: pre;
+  cursor: pointer;
+  line-height: 1.4em;
+}
+
+#endpointGET-ol span.endpoint {
+  border: 1px solid black;
+}
+
+#endpointGET-ol a {
+  float: right;
+}
+
+#endpointGET-ol:has(li:only-of-type) {
+  /* hide the fact that we have a list when only one li */
+  list-style: none;
+}
+
+#endpointGET-ol:not(:has(li:only-of-type)) {
+  /* If there is only one li, we will hide the li number
+  What is -1? It makes first item be 0 because 1 -1 = 0 */
+  counter-reset: endpointGET_li_counter -1;
+  list-style-type: none;
+}
+
+#endpointGET-ol:not(:has(li:only-of-type)) li:before {
+  /* #endpointGET-ol li { display: block; } */
+  content: counter(endpointGET_li_counter) " ";
+  counter-increment: endpointGET_li_counter;
+  float: left;
+}

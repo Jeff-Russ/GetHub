@@ -1,0 +1,81 @@
+@charset "UTF-8";
+/* .draggable_list_items > li {
+  border: 1px solid black;
+} */
+.draggable_list_items {
+  display: inline-block;
+}
+.draggable_list_items > li {
+  border: 1px;
+  padding: 5px;
+}
+.draggable_list_items > li.dragElem {
+  opacity: 0.4;
+}
+.draggable_list_items > li.over {
+  margin-top: 1.3em;
+  transition: margin 500ms;
+}
+.draggable_list_items > li:not(.over) {
+  margin-top: 0;
+  transition: margin 800ms;
+}
+.draggable_list_items > li.drop-confirm {
+  box-shadow: inset 0 0 15px rgba(108, 237, 196, 0.5);
+  transition: box-shadow 500ms;
+}
+.draggable_list_items li:first-child:not(:only-child) button[draggable]:after {
+  content: "↓";
+}
+.draggable_list_items li:not(:first-child):not(:last-child) button[draggable]:after {
+  content: "⇅";
+}
+.draggable_list_items li:last-child:not(:only-child) button[draggable]:after {
+  content: "↑";
+}
+
+.draggable_list_items:has(li:only-of-type) button[draggable]{
+  display: none;
+}
+
+.draggable_list_items button {
+  float: left;
+  padding-left: 2px;
+  padding-right: 2px;
+  margin-left: 1px;
+  margin-right: 1px;
+  width: 15px;
+  height: 15px;
+  vertical-align: text-top;
+  text-align: left;
+}
+.draggable_list_items button[draggable] {
+  /*This <button> element is added by JS */
+  cursor: grabbing;
+}
+
+/*This <button> elements are added by JS */
+.draggable_list_items button[draggable],
+.deletable_list_items button[deletable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+  background: transparent;
+  border: none;
+  background-size: 120% 120%;
+  background-position: center center;
+}
+
+.deletable_list_items button[deletable]:after {
+  /* This will render the 'X' */
+  content: "×";
+  font-size: 1.2em;
+  line-height: 1.1em;
+  color: red;
+}
+
+/*# sourceMappingURL=makeListEditable.css.map */

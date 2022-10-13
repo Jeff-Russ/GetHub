@@ -23,7 +23,7 @@
 //    * text inserted within split between segements of the button_el.innerText 
 //    * that are and aren't editable (surrounded by { }). 
 //    * 
-//    * In the former case: only one non-ediable text element take from button_el.innerText 
+//    * In the former case: only one non-editable text element take from button_el.innerText 
 //    */
 
 //   if (button_el.getAttribute('listening') === 'true') {
