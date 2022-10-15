@@ -1,4 +1,19 @@
 /**
+ * Example usage:
+ *  fetchGET('https://api.github.com/users/edx/repos')
+ *    .then(json => {
+ *      // use json
+ *    })
+ *    .catch(error => { console.log(`Error: ${error.message}`); });
+ * @param {string} url 
+ * @returns json or Promise.reject(new Error(res.status))
+ */
+async function fetchGET(url) {
+  const res = await fetch(url)
+  return res.ok ? res.json() : Promise.reject(new Error(res.status));
+}
+
+/**
  * https://itnext.io/explode-an-array-into-a-deeply-nested-object-with-this-simple-recursive-function-4094ac1eeb8b
  * explode lets you take an array and convert it to an object where the keys become the value of a particular 
  * property within each object and the name of the key is passed as the second arg to explode. 
@@ -297,7 +312,7 @@ function saveAndLoadPageState(element_id) {
   var content = document.getElementById('element_id');
 
   // this line isn't really necessary here but you have to append this attribute to the element you want the html stored of.
-  content.setAttribute("contenteditable", "true")
+  content.setAttribute("contenteditable")//, "true")
 
   // save the page's state after you're done with editing and clicked outside the content
   content.addEventListener("blur", () => {
@@ -318,4 +333,141 @@ function saveAndLoadPageState(element_id) {
   }
 }
 
+
+
+/**
+ * src: https://stackoverflow.com/a/9547490
+ * passing "hello=1&another=2" returns {hello: 1, another: 2}
+ * passing ("0=zeroth&1=first", []) returns ['zeroth', 'first']
+ * passing ("0=zeroth&2=second", []) returns [ 'zeroth', <1 empty item>, 'second' ]
+ * @param {string} query_string portion starting or after '?' 
+ * @param {object} result should be {} or []. {} is default 
+ * @returns Object (null prototype) with key/value pairs if result={} or array if result=[]
+ */
+function parseQuery(query_string, result) {
+  if (/\%[a-zA-Z0-9]{2}/.test(query_string)) {
+    query_string = decodeURIComponent(query_string)
+  }
+  result ??= Object.create( null );
+  const pairs = (query_string[0] === '?' ? query_string.slice(1) : query_string).split('&');
+  for (const element of pairs) {
+      const pair = element.split('=');
+      result[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+  }
+  return result;
+}
+
+/** TO BE COMPLETED
+ * parses similar Angular as shown: https://stackoverflow.com/a/9547490,
+ * only, like the Ruby, query ending '[]' do not result in object keys ending '[]'.
+ * Additionally, on can place a integer between `[` and `]` in query string to specify array index.
+ * @param {string} query_string portion starting or after '?' 
+ * @returns Object (null prototype)  with key/value pairs where arrays are build from duplicate keys
+ */
+function parseQueryMixed(query_string, result) {
+  if (/\%[a-zA-Z0-9]{2}/.test(query_string)) {
+    query_string = decodeURIComponent(query_string)
+  }
+  result ??= Object.create( null );
+  const pairs = (query_string[0] === '?' ? query_string.slice(1) : query_string).split('&');
+  for (const element of pairs) {
+      let [key, val] = element.split('=');
+      let idx = false
+      if (/\[\d*\] *$/.test(key)) {
+        [ key, idx ] = key.split(/[\[\]]/)
+      }
+      if (key in result || idx !== false) {
+        if (!(key in result)) {
+          result[key] = []
+        }
+        else if (!Array.isArray(result[key])) {
+          result[key] = [result[key]]
+        }
+        if (/ *\d+ */.test(idx)) {
+          result[key][parseInt(idx)] = val
+        } else {
+          result[key].push(val)
+        }
+      }
+      else {
+        result[key] = val
+      }
+  }
+  return result;
+}
+
+function parseQueryMixed_test() {
+  function runTest(query_string, expect) {
+    const got = JSON.stringify(parseQueryMixed(query_string))
+    const result = expect == got ? 'pass' : 'fail'
+    console.log( expect == got ? 'pass' : 'fail' )
+    if (result === 'fail') {
+      console.log(`expect:\n${expect}\ngot:\n${got}`)
+    }
+  }
+  let query_string, expect;
+
+  query_string = '?list_a=1&list_a=2&list_a=3&list_b[]=1&list_b[]=2&list_b[]=3&list_c=1,2,3'
+  expect = JSON.stringify({
+    list_a: [ "1", "2", "3" ],
+    list_b: [ "1", "2", "3" ],
+    list_c: "1,2,3"
+  });
+  runTest(query_string, expect)
+
+  query_string = '?list_a=1&list_a=2&list_a=3&list_b[]=1&list_b[2]=2&list_b[]=3&list_c=1,2,3'
+  expect = JSON.stringify({
+    list_a: [ "1", "2", "3" ],
+    list_b: [ "1", null, "2", "3" ],
+    list_c: "1,2,3"
+  });
+  runTest(query_string, expect)
+}
+
+function unparseQueryMixed(obj) {
+  const array = Object.keys(obj).map(k=> {
+    if (!Array.isArray(obj[k])) return `&${k}=${obj[k]}`
+    let next_idx = 0
+    return obj[k].map((el,idx)=> {
+      if (idx === next_idx++) return `&${k}=${el}`
+      else {
+        next_idx = idx
+        return `&${k}[${next_idx++}]=${el}`
+      }
+    }).join('')
+  })
+  return '?'+array.join('').slice(1)
+}
+
+
+unparseQueryMixed({ list_a: [ "1", "2", "3" ], list_b: [ "1", "2", "3" ], list_c: "1,2,3" })
+
+function unparseQueryMixed_test() {
+  function runTest(obj, expect) {
+    const got = unparseQueryMixed(obj)
+    expect = expect
+    const result = expect == got ? 'pass' : 'fail'
+    console.log( expect == got ? 'pass' : 'fail' )
+    if (result === 'fail') {
+      console.log(`expect:\n${expect}\ngot:\n${got}`)
+    }
+  }
+  let obj, expect;
+
+  obj = {
+    list_a: [ "1", "2", "3" ],
+    list_b: [ "1", "2", "3" ],
+    list_c: "1,2,3"
+  };
+  expect = '?list_a=1&list_a=2&list_a=3&list_b=1&list_b=2&list_b=3&list_c=1,2,3';
+  runTest(obj, expect);
+
+  obj = {
+    list_a: [ "1", "2", "3" ],
+    list_b: [ "1",, "2", "3" ],
+    list_c: "1,2,3"
+  };
+  expect = '?list_a=1&list_a=2&list_a=3&list_b=1&list_b[2]=2&list_b=3&list_c=1,2,3';
+  runTest(obj, expect);
+}
 

@@ -71,6 +71,11 @@
   background-position: center center;
 }
 
+/* If only one item, you cannot reorder list to hide draggable button: */
+.draggable_list_items > li:only-of-type > button[draggable] {
+  display: none;
+}
+
 .deletable_list_items button[deletable]:after {
   /* This will render the 'X' */
   content: '\00d7';

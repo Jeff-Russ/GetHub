@@ -1,8 +1,11 @@
+const fs = require('fs');
 const express = require('express')
 // const path = require('path');     
 
-const { gh_api_options } = require('./data/gh_api_options.js');
+// const { gh_api_options } = require('./data/gh_api_options.js');
 const { companies } = require('./data/companies-on-github.js');
+
+const { get } = require('./lib/data-object-helpers.js');
 
 const app = express()
 const port = 3000
@@ -14,9 +17,9 @@ app.use(express.static('public'))
 // app.use(express.static( path.join( __dirname, '/public' ) ) );
 
 app.get('/', (req, res) => {
-  const fs = require('fs');
-  const data_endpoints_json = JSON.parse(fs.readFileSync('./data/endpoints.json'));
-  res.render('pages/index', { data_endpoints_json });
+  const endpoints_json = JSON.parse(fs.readFileSync('./data/endpoints.json'));
+  // endpoints_json.get = get
+  res.render('pages/index', { endpoints_json, companies });
 });
 
 app.listen(port, () => {

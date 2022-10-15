@@ -33,11 +33,6 @@
 .draggable_list_items li:last-child:not(:only-child) button[draggable]:after {
   content: "↑";
 }
-
-.draggable_list_items:has(li:only-of-type) button[draggable]{
-  display: none;
-}
-
 .draggable_list_items button {
   float: left;
   padding-left: 2px;
@@ -68,6 +63,11 @@
   border: none;
   background-size: 120% 120%;
   background-position: center center;
+}
+
+/* If only one item, you cannot reorder list to hide draggable button: */
+.draggable_list_items > li:only-of-type > button[draggable] {
+  display: none;
 }
 
 .deletable_list_items button[deletable]:after {
