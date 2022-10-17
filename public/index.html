@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="styles/page-styles.css" rel="stylesheet" type="text/css">
+  <link href="styles/endpoints.css" rel="stylesheet" type="text/css">
+  <link href="styles/makeListEditable.css" rel="stylesheet" type="text/css">
+  <link href="styles/api-response.css" rel="stylesheet" type="text/css">
+  <style>
+    select {width: 20em;}
+    .multiselect-dropdown, .multiselect-dropdown * {
+    
+    }
+  </style>
+  <title>GetHub — Query the GitHub API</title>
+ 
+</head>
+<body>
+
+
+<div id="endpoints">
+  <div id="endpoints-menu" class="picker">
+    <h2 style="margin:0">&nbsp;GitHub API GET Endpoints</h2>
+    
+  </div>
+  
+  <div id="endpointGET" > 
+    <!-- <li> will  be inserted and later on, each will have some filter rules -->
+    <ol id="endpointGET-ol"></ol>
+    <br>
+    <button id="endpointGET-submit" style="border: 0.5px solid #64b67b;">
+      <strong><code >GET</code></strong>
+    </button>
+  </div>
+
+</div>
+<!-- 
+  <label>Select 2</label>
+  <select name="field2" id="field2" 
+    multiple multiselect-search="true" 
+    multiselect-select-all="true" 
+    multiselect-max-items="10" placeholder="Select a Car"
+    onchange="console.log(this.selectedOptions)">
+    <option>Abarth</option>
+    <option>Alfa Romeo</option>
+    <option>Aston Martin</option>
+    <option>Audi</option>
+    <option>Bentley</option>
+    <option>BMW</option>
+    <option>Bugatti</option>
+    <option>Cadillac</option>
+    <option>Chevrolet</option>
+    <option>Chrysler</option>
+    <option>Citroën</option>
+    <option>Dacia</option>
+    <option>Daewoo</option>
+    <option>Daihatsu</option>
+    <option>Dodge</option>
+    <option>Donkervoort</option>
+    <option>DS</option>
+    <option>Ferrari</option>
+    <option>Fiat</option>
+    <option>Fisker</option>
+    <option>Ford</option>
+    <option>Honda</option>
+    <option>Hummer</option>
+    <option>Hyundai</option>
+    <option>Infiniti</option>
+    <option>Iveco</option>
+    <option>Jaguar</option>
+    <option>Jeep</option>
+    <option>Kia</option>
+    <option>KTM</option>
+    <option>Lada</option>
+    <option>Lamborghini</option>
+    <option>Lancia</option>
+    <option>Land Rover</option>
+    <option>Landwind</option>
+    <option>Lexus</option>
+    <option>Lotus</option>
+    <option>Maserati</option>
+    <option>Maybach</option>
+    <option>Mazda</option>
+  </select> -->
+
+
+
+
+
+<div id="api-response" class="data-linkify">
+</div>
+<script type="module" src="module.js"></script>
+<script src="js/helpers.js"></script>
+<!-- <script src="js/multiselect-dropdown.js"></script> -->
+<script src="endpoints/endpoints.js"></script>
+<script src="api-response/renderjson.js"></script>
+<script src="api-response/linkify.js"></script>
+<script src="makeListEditable/makeListEditable.js"></script>
+
+<script>
+
+
+const endpointPreview = (endpoint) => 
+  `<a class="endpoint-preview" href="https://api.github.com${endpoint}" target="_blank"><a>`
+
+function clickApiEndpointValid(btn) {
+  const endpoint = (typeof btn === 'string') ? btn : btn.innerText;
+  console.log(`clickApiEndpointValid on "${endpoint}"`)
+  const endpointGET_ol = document.getElementById('endpointGET-ol')
+  const endpoint_preview = endpointPreview(endpoint)
+  console.log(endpoint_preview)
+  endpointGET_ol.insertAdjacentHTML( 'beforeend', `<li endpoint="${endpoint}"><span class="endpoint">${endpoint}<span contenteditable> </span></span>${endpoint_preview}</li>` );
+  makeListEditable(endpointGET_ol)
+}
+
+
+function clickApiEndpointTemplate(btn) {
+  const text = (typeof btn === 'string') ? btn : btn.innerText
+  const endpoint = text.replace(/{([^a-zA-Z0-9+])/, '$1{');
+  console.log(`clickApiEndpointTemplate on "${endpoint}"`)
+  const endpoint_html = endpoint.split(/(\{.*?\})/g).reduce(
+    (a,s)=> (s[0] !== '{' ? a+s : `${a}<span contenteditable orig=${s}>${s}</span>`),
+    ''
+  );
+  const endpoint_preview = endpointPreview(endpoint)
+  console.log(endpoint_preview)
+  const endpointGET_ol = document.getElementById('endpointGET-ol')
+  endpointGET_ol.insertAdjacentHTML( 'beforeend', `<li endpoint="${endpoint}"><span class="endpoint">${endpoint_html}<span contenteditable> </span></span>${endpoint_preview}</li>` );
+  makeListEditable(endpointGET_ol)
+  
+}
+
+
+function handleClickApiEndpointValid(event) {
+  console.log('handleClickApiEndpointValid')
+  clickApiEndpointValid(event.target)
+}
+function handleClickApiEndpointTemplate(event) {
+  console.log('handleClickApiEndpointTemplate')
+  clickApiEndpointTemplate(event.target)  
+}
+
+function pushQueryString(query_string) {
+  if (history.pushState) {
+    const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + query_string;
+    window.history.pushState({path:newurl},'',newurl);
+  }
+}
+
+function selectedEndpointsToQueryString(endpoints_list, pushState=true) {
+  endpoints_list ??= document.getElementById('endpointGET-ol')
+  const query_string = '?endpoint=' + [...endpoints_list.querySelectorAll('li')].map(li=>{
+    const user_values = [...li.querySelectorAll('span > span[contenteditable')].map(editable => {
+      return `"${editable.innerText}"`
+    }).join(',')
+    return `${li.getAttribute('endpoint')}(${user_values})`
+
+  }).join('&endpoint=')
+  if (query_string.length > 10) {
+    if (pushState) pushQueryString(query_string)
+    return query_string
+  }
+  return ''
+}
+
+function parseQueryStringEndpoints(list_el_to_populate=false, get=false) {
+  if (!window.location.search) return
+  let {endpoint: endpts} = parseQueryMixed(window.location.search)
+  if (!Array.isArray(endpts)) return
+  endpts = endpts.map(endpt => {
+    const [endpoint, ...editables] = endpt.split(/\("|","|"\)/).filter(Boolean)
+    return { endpoint, editables: [...editables], is_template: !!editables.join('').trim()}
+  })
+  if (list_el_to_populate) {
+    if (list_el_to_populate === true) {
+      list_el_to_populate = document.getElementById('endpointGET-ol') // default if true
+    }
+    for (const endpt of endpts) {
+      if (endpt.is_template) {
+        clickApiEndpointTemplate(endpt.endpoint)
+        const editables = list_el_to_populate.querySelectorAll(`li:last-of-type > span.endpoint > span[contenteditable]`)
+        editables.forEach((editable, idx) => {
+          editable.innerText = endpt.editables[idx] || ''
+        })
+      }
+      else clickApiEndpointValid(endpt.endpoint)
+    }
+    if (get) {
+      handleClickGET(...[,false]) // false means don't update query string
+    }
+  } 
+  return endpts
+}
+
+async function handleClickGET(event/*ignored*/, update_query_string=true) {
+  const endpoints_list = document.getElementById('endpointGET-ol')
+
+  const endpoint_spans = Array.from(endpoints_list.querySelectorAll('span.endpoint'))
+  selected_URLs = endpoint_spans.map(span => `https://api.github.com${span.innerText.trim()}`) 
+
+  try {
+    // const errors = [];
+
+    responses = await Promise.all(
+      selected_URLs.map(endpoint => (
+        fetch(endpoint).then(res => res.ok ? res.json() : {ERROR: res.status})
+      )
+    ));
+    json = responses.reduce( (ob, res, idx) => (
+      {...ob, [`${idx} ${selected_URLs[idx].slice(22)}`]: objectifyArray(res)}
+    ), {});
+    const api_response_el = document.getElementById("api-response")
+    api_response_el.innerHTML = '';
+    renderjson.set_icons("▶", "▼")
+    renderjson.set_show_to_level(3)
+    api_response_el.appendChild(renderjson(json));
+    linkify(handleClickApiEndpointValid, handleClickApiEndpointTemplate);
+    // if (errors.length) throw new AggregateError(errors, "fetch failed!");
+  }
+  catch(err) {
+    console.error("WE GOT an ERROR", err);
+  }
+  finally {
+    if (update_query_string) {
+      selectedEndpointsToQueryString()
+    }
+  }
+}
+
+//// GLOBALS ////////////////////
+
+
+var endpoints_json = window.endpoints_json;
+var endps_menu_filter = {},
+    endpoints_displayed = [], // this is endpoints_json.endpoints, filtered and sorted
+    selected_URLs,  
+    responses, 
+    json;
+
+
+/**
+ * initalizes endps_menu_filter global if needed and sets the current selection within it to
+ * Selections argument, if provided. Otherwise the current selection is set to Default.
+ * @param {object} Selections If not provided, endps_menu_filter.Selections = endps_menu_filter.Defaults
+ * @returns endps_menu_filter
+ */
+function set_endps_menu_filter(Selections) {
+  if (!endps_menu_filter.Options) {
+    endps_menu_filter.Options = { 
+      Show: {
+        Category: endpoints_json.categories,  // an array: multiple selections but not none
+        API: Object.keys(endpoints_json.apis),// an array: multiple selections but not none
+        Parameters: {
+          Require: ['Any', 'All'], // user picks one
+          selections: ["None", ...endpoints_json.parameters],// an array: multiple selections, allow all and none
+        },
+      },
+      Sort: [ // user selects three of these (no dups) and only one from each of two.
+        [ 'Category ▼',   'Category ▲' ], 
+        [ 'API ▼' ,       'API ▲' ],
+        [ 'Parameters ▼', 'Parameters ▲' ] // this is the number of parameters
+        [ 'Endpoint ▼',   'Endpoint ▲' ] // alphanum by endpoint string. THIS CAN ONLY BE THE THIRD SELECTION
+      ],
+
+      // [ 'Category', 'API', 'Parameters', 'Endpoint']
+    };
+  }
+  if (Selections) {
+    if (endps_menu_filter.Selections) {
+      endps_menu_filter.Selections = {...endps_menu_filter.Selections, ...Selections};
+    } else if (endps_menu_filter.Defaults) {
+      endps_menu_filter.Selections = {...endps_menu_filter.Defaults, ...Selections};
+    } else {
+      endps_menu_filter.Selections = {...endps_menu_filter.Options, ...Selections};
+    }
+  } else {
+    if (!endps_menu_filter.Defaults) {
+      // you can set defaults here
+      endps_menu_filter.Defaults = { 
+        Show: { 
+          Category: [...endpoints_json.categories],
+          API: Object.keys(endpoints_json.apis),
+          Parameters: {
+            selections: ["None", ...endpoints_json.parameters],
+            Require: ['Any'], 
+          },
+        },
+        Sort: [ 'Category ▲', 'Parameters ▼', 'API ▼'],
+      };
+    }
+    if (!endps_menu_filter.Selections) {
+      endps_menu_filter.Selections = {...endps_menu_filter.Defaults}
+    }
+  }
+  
+
+
+  return endps_menu_filter
+}
+
+function set_endpoints_displayed() {
+  // uses endps_menu_filter global to set endpoints_displayed global
+  // must be called after endps_menu_filter is set, which should be called after user or query string
+  // has defined selections, or just defaults are set.
+  const { Show, Sort } = endps_menu_filter.Selections;
+  const all_params = Show.Parameters.Require === 'All';
+  const show_params = all_params ? JSON.stringify([...Show.Parameters.selections].sort()) : Show.Parameters.selections
+  const sort_criteria = Sort.map( cri => {
+    const prop = cri.slice(0, -2).toLowerCase();
+    const direction = cri.slice(-1) === '▼' ? 1 : -1;
+    if (prop === 'parameters') {
+      return [(el)=>el.parameters.length, direction ]
+    } else {
+      return [prop, direction ]
+    }
+  })
+
+  endpoints_displayed = multiCriteriaSort(
+    endpoints_json.endpoints.filter(endp => {
+      if (!(Show.Category.includes(endp.category))) {
+        console.log(`${endp.category} was not in ${Show.Category}`)
+        return false;
+      }      
+      if (!(Show.API.includes(endp.api))) return false;
+      if (all_params && (show_params !== JSON.stringify([...endp.parameters].sort()))) {
+        return false;
+      } 
+      else {
+        endp.parameters.forEach(param => {
+          if (!(param in show_params)) {
+            return false;
+          }
+        })
+      }
+      return true;
+    }),
+    ...sort_criteria
+  );
+  return endpoints_displayed; // just for good measure
+}
+
+
+
+
+
+// window.MultiselectDropdownOptions = {
+
+// }
+
+////////////////////////////////
+
+
+
+function displayEndpoints() {
+
+  if (!endps_menu_filter || !endps_menu_filter.Selections) {
+    set_endps_menu_filter(); // with user settings? 
+  }
+  if (!endpoints_displayed) {
+    set_endpoints_displayed();
+  }
+
+  
+  const ext_link = (url, name) => `<a href="${url}" target="_blank">${name ? name : ''}</a>`
+  
+
+  const [sections_order, sort] = divideArray(
+    endps_menu_filter.Selections.Sort.map( cri => cri.slice(0, -2) ),
+    2, 1);
+
+  const make_api_links = !sections_order.includes('API')
+  // we won't bother with category buttons since that's just a thing I made up anyway.
+
+
+  const get = {menu: {}, submenu: {}}
+
+
+  for (let [i, section] of Object.keys(get).entries()) {
+    const menu = i ? 'submenu' : 'menu'
+  
+    if (sections_order[i] === 'Parameters') {
+      get[section].picker = endp => `<button class="picker-${menu}-btn"><strong>${endp.parameters.length} Parameters</strong></button>`;
+      get[section].current = endp => endp.parameters.length;
+    }
+    else if (sections_order[i] === 'Category') {
+      get[section].picker = endp => `<button class="picker-${menu}-btn"><strong>${endp.category}</strong></button>`;
+      get[section].current = endp => endp.category;
+    }
+    else if (sections_order[i] === 'API') {
+      get[section].picker = endp => `<button class="picker-${menu}-btn">${endp.api}</button>&nbsp;${ext_link(endp.api_doc_link, 'docs')}`;
+      get[section].current = endp => endp.api;
+    }
+  }
+
+
+  
+
+  let current_menu_li, current_menu_li_ul, 
+      current_submenu_li, current_submenu_li_ul;
+
+  
+
+  const endpoints_ul = ul();
+
+  const endpointHtml = (endp, make_api_links) => {
+    const is_valid = !endp.parameters.length
+    const type = is_valid ? 'template' : 'valid';
+    const preview = is_valid ? ('&nbsp;'+ext_link(`https://api.github.com${endp.endpoint}`)) : ''
+    const endp_doc = ext_link(endp.endpoint_doc_link, 'docs');
+    const api_doc = make_api_links 
+      ? ('&nbsp;'+ext_link(endp.api_doc_link, `${endp.api} docs`)) : ''
+    return `<button class="picker-select-btn api-endpoint ${type}">${endp.endpoint}</button>${preview}&nbsp;${endp_doc}${api_doc}`;
+  }
+
+
+  for (const endpoint of endpoints_displayed) {
+    const new_menu = get.menu.current(endpoint) !== get.menu.previous;
+    if (new_menu) {
+      current_menu_li = li(get.menu.picker(endpoint));
+      // current_menu_li.insertAdjacentHTML('beforeend', );
+      current_menu_li_ul = ul();
+      current_menu_li.appendChild(current_menu_li_ul);
+      endpoints_ul.appendChild(current_menu_li);
+      get.menu.previous = get.menu.current(endpoint);
+    }
+    const new_submenu = get.submenu.current(endpoint) !== get.submenu.previous;
+    if (new_menu || new_submenu) {
+      current_submenu_li = li(get.submenu.picker(endpoint));
+      current_submenu_li_ul = ul();
+      current_submenu_li.appendChild(current_submenu_li_ul);
+      current_menu_li_ul.appendChild(current_submenu_li);
+      get.submenu.previous = get.submenu.current(endpoint);
+    }
+    
+    current_submenu_li_ul.appendChild(li(endpointHtml(endpoint, make_api_links)));
+  }
+
+  document.getElementById('endpoints-menu').appendChild(endpoints_ul)
+
+
+/*
+<ul>
+
+  <li>
+    <button class="picker-menu-btn"><strong>${category}</strong></button>
+    <ul>
+      
+      <li>
+        <button class="picker-submenu-btn"></button>&nbsp;<a href="${api_doc_link}" target="_blank">${api}</a>
+        <ul>
+          
+          <li>
+            ${endpoint_btn}&nbsp;
+            ${docs_a}
+          </li>
+
+        </ul>
+      </li>
+      
+    </ul>
+  </li>
+
+</ul>
+*/
+
+//   const endpoints = endpoints_json.endpoints.map(obj => {
+//     let { endpoint, parameters, endpoint_doc_link, category, api, api_doc_link } = obj
+
+//     endpoint_btn = `<button class="picker-select-btn api-endpoint ${parameters.length ? 'template' : 'valid'}">
+//       ${endpoint}
+//     </button>`
+
+//     const docs_a = `<a href="${endpoint_doc_link}" target="_blank"></a>`
+//     category = `${category}`
+//     api = `<a href="${api_doc_link}" target="_blank">${api}</a>`
+
+
+//     return { endpoint, docs, category, api}
+//     })
+//   // console.log(document.body)
+//   document.body.appendChild(buildHtmlTable(endpoints, true));
+}
+
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+
+  
+
+  /*
+  <button class="picker-select-btn api-endpoint template">/repos/{owner}/{repo}/actions/artifacts</button>&nbsp;
+  <a href="https://docs.github.com/en/rest/actions/artifacts#list-artifacts-for-a-repository" target="_blank"></a>
+  */
+  set_endps_menu_filter()
+  set_endpoints_displayed(true)
+  displayEndpoints()
+    
+  makeEndpointsMenuCollapsible()
+  setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemplate)
+  makeListEditable(document.getElementById('endpointGET-ol'))
+  parseQueryStringEndpoints(true, true)  
+  document.getElementById('endpointGET-submit').addEventListener('click', handleClickGET)
+
+});
+  
+</script>
+</body>
+</html>

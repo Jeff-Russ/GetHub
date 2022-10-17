@@ -471,3 +471,296 @@ function unparseQueryMixed_test() {
   runTest(obj, expect);
 }
 
+/**
+ * multiCriteriaSort sorts (by value) an array of objects by multiple, nested criterion.
+ * @param {array} array_of_objects 
+ * @param {*} array_of_objects 
+ * @param  {...[string, string|integer]} ordered_criteria n arrays where each has two elements:
+ * the first is the key directly in the object within array_of_objects to be sorted or a function
+ * two be called on array_of_objects, the return of which is compared between elements in array_of_objects
+ * and 
+ * the second is a string starting 'a' or 1 for ascending or a string starting 'd' or -1 for descending.
+ * @returns the array_of_objects sort first by ordered_criteria[0] then by ordered_criteria[1], etc.
+ */
+function multiCriteriaSort(array_of_objects, ...ordered_criteria) {
+  array_of_objects.sort(function(a, b) {
+    for (let [ prop, direction ] of ordered_criteria) {
+      if (typeof direction !== 'number') {
+        direction = +(direction < 'd') * 2 - 1
+      }
+      if (typeof prop === 'function') {
+        if (prop(a) > prop(b)) return direction
+        if (prop(a) < prop(b)) return -direction
+      }
+      else {
+        if (a[prop] > b[prop]) return direction
+        if (a[prop] < b[prop]) return -direction
+      }
+    }
+  });
+  return array_of_objects
+}
+
+/**
+ * @param {array} array 
+ * @returns sum of all elements in array
+ */
+const sumArray = (array) => array.reduce((sum, n) => sum + n, 0);
+
+function multiCriteriaSort_test() {
+
+  let votes = [
+    { title: 'c', votes: 2, nums: [1,1] },
+    { title: 'b', votes: 2, nums: [1,2] },
+    { title: 'c', votes: 1, nums: [1,2,3] },
+    { title: 'a', votes: 2, nums: [2,3,4] },
+    { title: 'a', votes: 1, nums: [] },
+    { title: 'd', votes: 3, nums: [10, 10] },
+    { title: 'b', votes: 3, nums: [100] },
+    { title: 'd', votes: 2, nums: [1,2,3] },
+    { title: 'b', votes: 1, nums: [1,2,3] },
+    { title: 'a', votes: 3, nums: [1,2,3] },
+    { title: 'c', votes: 3, nums: [1,2,3] },
+    { title: 'd', votes: 1, nums: [1,2,3] },
+  ];
+  console.log(votes)
+  console.log("sort by title, ascending, then by votes, descending:")
+  multiCriteriaSort(votes, ['title', 'asc'], ['votes', 'desc'])
+  console.log(votes)
+  
+  console.log("sort by votes, descending, then by title, descending:")
+  multiCriteriaSort(votes,  ['votes', -1], ['title', -1])
+  console.log(votes)
+
+  console.log("sort by votes, ascending, then by title, ascending:")
+  multiCriteriaSort(votes, ['votes', 'a'], ['title', 'a'])
+  console.log(votes)
+
+  console.log("sort by sum of nums, descending, then by votes, descending:")
+  multiCriteriaSort(votes, [(el)=>sumArray(el.nums), -1], ['votes', -1])
+  console.log(votes)
+
+  console.log("sort by length of nums, descending, then by votes, descending:")
+  multiCriteriaSort(votes, [(el)=>el.nums.length, -1], ['votes', -1])
+  console.log(votes)
+
+}
+
+/**
+ * https://stackoverflow.com/a/35385518
+ * @param {String} HTML representing a single element
+ * @return {Element}
+ */
+ function htmlToElement(html) {
+  const template = document.createElement('template');
+  html = html.trim(); // Never return a text node of whitespace as the result
+  template.innerHTML = html;
+  return template.content.firstChild;
+}
+
+
+/**
+ * https://stackoverflow.com/a/35385518
+ * @param {String} HTML representing any number of sibling elements
+ * @return {NodeList} 
+ */
+function htmlToElements(html) {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  return template.content.childNodes;
+}
+
+
+// Builds the HTML Table out of myList json data from Ivy restful service.
+function buildHtmlTable(arr, values_are_html_elements=false) {
+
+
+  function addAllColumnHeaders(arr, table) {
+    // Adds a header row to the table and returns the set of columns.
+    // Need to do union of keys from all records as some records may not contain
+    // all records
+    const columnSet = [],
+    tr = document.createElement('tr').cloneNode(false);
+    for (let i = 0, l = arr.length; i < l; i++) {
+      for (let key in arr[i]) {
+        if (arr[i].hasOwnProperty(key) && columnSet.indexOf(key) === -1) {
+          columnSet.push(key);
+          const th = document.createElement('th').cloneNode(false);
+          th.appendChild(document.createTextNode(key));
+          tr.appendChild(th);
+        }
+      }
+    }
+    table.appendChild(tr);
+    return columnSet;
+  }
+
+  const table = document.createElement('table').cloneNode(false),
+  columns = addAllColumnHeaders(arr, table);
+
+  for (let i = 0, maxi = arr.length; i < maxi; ++i) {
+    const tr = document.createElement('tr').cloneNode(false);
+    for (let j = 0, maxj = columns.length; j < maxj; ++j) {
+      const td = document.createElement('td').cloneNode(false);
+      // const cellValue = arr[i][columns[j]];
+      if (values_are_html_elements && arr[i][columns[j]]) {
+        td.appendChild(htmlToElement(arr[i][columns[j]]));
+      } else {
+        td.appendChild(document.createTextNode(arr[i][columns[j]] || ''));
+      }
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+  return table;
+}
+
+
+function getSelectValues(select) {
+  // source: https://stackoverflow.com/a/5867262
+  const result = [];
+  const options = select && select.options;
+  let opt;
+
+  for (let i=0, iLen=options.length; i<iLen; i++) {
+    opt = options[i];
+
+    if (opt.selected) {
+      result.push(opt.value || opt.text);
+    }
+  }
+  return result;
+}
+
+/**
+ * Divides an array into two parts, with the length of each determined by the second and third args.
+ * The return is an array of these two parts, where each is either is an array or a single element,
+ * depending on whether its cooresponding size is more than 1 or 1, respectively. 
+ * @param {array} arr the array to be divided
+ * @param {integer} size0 the size of the first element in return
+ * @param {integer} size1 the size of the second element in return
+ * @returns an array of two elements, each an array if the length is > 1, else it is one element.
+ */
+const divideArray = (arr, size0, size1) => [
+  size0 === 1 ? arr[0] : arr.slice(0, size0),
+  size1 === 1 ? arr[arr.length-1] : arr.slice(-size1)
+]
+
+/**
+ * @param {Node|string} child (optional) Node or html string to be added within new element
+ * @returns newly created HTMLUListElement
+ */
+function ul(child)  {
+  const node = document.createElement('ul');
+  if (typeof child === 'string')
+    node.insertAdjacentHTML('beforeend', child);
+  else if (child)
+    node.appendChild(child)
+  return node;
+}
+
+/**
+* @param {Node|string} child (optional) Node or html string to be added within new element
+* @returns newly created HTMLLIElement
+*/
+function li(child) {
+  const node = document.createElement('li')
+  if (typeof child === 'string')
+    node.insertAdjacentHTML('beforeend', child);
+  else if (child)
+    node.appendChild(child)
+  return node;
+}
+
+
+/**
+ * Returns all permutatins of the elements in an array
+ * source: https://stackoverflow.com/a/37580979
+ * @param {array} array 
+ * @returns array of all permuations of array (wihout repetitions) where is the same size as array
+ */
+ function permute(array) {
+  var length = array.length,
+      result = [array.slice()],
+      c = new Array(length).fill(0),
+      i = 1, k, p;
+
+  while (i < length) {
+    if (c[i] < i) {
+      k = i % 2 && c[i];
+      p = array[i];
+      array[i] = array[k];
+      array[k] = p;
+      ++c[i];
+      i = 1;
+      result.push(array.slice());
+    } else {
+      c[i] = 0;
+      ++i;
+    }
+  }
+  return result;
+}
+
+/**
+ * Returns all permutatins of the elements in an array, with size limited by k
+ * adapted from https://stackoverflow.com/a/37580979
+ * @param {array} array 
+ * @param {integer} k size of each permutation. Must be <= array.length
+ * @returns array of all permuations of array (wihout repetitions) where is the k
+ */
+function permuteChooseK(array, k) {
+  const found = []
+  const result = []
+  permute(array).forEach(arr => {
+    const resized = arr.slice(0, k)
+    console.log(resized)
+    const json = JSON.stringify(resized)
+    if (! found.includes(json)) {
+      found.push(json)
+      result.push(resized)
+    } else {
+      console.log("already found")
+    }
+  })
+  return result;
+}
+
+
+/**
+ * src: https://www.geeksforgeeks.org/combinations-with-repetitions/
+ * @param {array} array 
+ * @param {integer} r number of elements in each returned array of combinations
+ * @returns  array of arrays where each is combinations (with repetitions) of elements in array and is of size r
+ */
+function CombinationRepetition(array,r) {
+  const n = array.length
+  const results = []
+
+  function CombinationRepetitionUtil(chosen, array, index, r, start, end) {
+    // Since index has become r, current combination is ready to be printed, print
+    if (index == r) {
+      results.push([])
+      const nth = results.length-1
+      for (var i = 0; i < r; i++) {
+        results[nth].push(array[chosen[i]])
+      }
+      return results
+    }
+
+    // One by one choose all elements (without considering the fact
+    // whether element is already chosen or not) and recur
+    for (var i = start; i <= end; i++) {
+      chosen[index] = i
+      CombinationRepetitionUtil(chosen, array, index + 1, r, i, end)
+    }
+    return results
+  }
+  var chosen = Array.from({ length: r + 1 }, (_, i) => 0) // Allocate memory
+
+  // Call the recursive function
+  return CombinationRepetitionUtil(chosen, array, 0, r, 0, n - 1)
+}
+
+
+

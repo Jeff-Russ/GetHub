@@ -16,11 +16,11 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'))
 // app.use(express.static( path.join( __dirname, '/public' ) ) );
 
-app.get('/', (req, res) => {
-  const endpoints_json = JSON.parse(fs.readFileSync('./data/endpoints.json'));
-  // endpoints_json.get = get
-  res.render('pages/index', { endpoints_json, companies });
-});
+// app.get('/', (req, res) => {
+//   const endpoints_json = JSON.parse(fs.readFileSync('./data/endpoints.json'));
+//   // endpoints_json.get = get
+//   res.render('pages/index', { endpoints_json, companies });
+// });
 
 app.listen(port, () => {
   console.log(`App listening at port ${port}`)

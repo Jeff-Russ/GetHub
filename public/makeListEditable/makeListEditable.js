@@ -145,7 +145,5 @@ function makeListEditable(list_elem, make_all_draggable=true, make_all_deletable
   }
 }
 
-function makeListItemEditable(li, list_elem, make_all_draggable=true, make_all_deletable=true) {
 
-}
 
