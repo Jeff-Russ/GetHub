@@ -6,9 +6,13 @@ gh-api-token.js
 
 data/endpoints-unordered.json
 data/endpoints.md
+data/endpoints-rework.js
 Notes-and-studies/
 public/parseJSONLike_test.html
 public/code-editor-*-test.html
+public/js/prism.js
+public/styles/hjs-dracula.css
+public/styles/prism-xonokai.css
 z_old/
 jail-test.js
 

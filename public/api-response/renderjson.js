@@ -18,7 +18,7 @@
 // the JSON you want to render as a single argument and returns an HTML
 // element.
 //
-// Options
+// options
 // -------
 // renderjson.set_icons("+", "-")
 //   This Allows you to override the disclosure icons.

@@ -144,6 +144,3 @@ function makeListEditable(list_elem, make_all_draggable=true, make_all_deletable
 
   }
 }
-
-
-

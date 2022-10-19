@@ -368,8 +368,9 @@ function parseQueryMixed(query_string, result) {
   if (/\%[a-zA-Z0-9]{2}/.test(query_string)) {
     query_string = decodeURIComponent(query_string)
   }
-  result ??= Object.create( null );
+  result = {};
   const pairs = (query_string[0] === '?' ? query_string.slice(1) : query_string).split('&');
+
   for (const element of pairs) {
       let [key, val] = element.split('=');
       let idx = false
@@ -393,6 +394,7 @@ function parseQueryMixed(query_string, result) {
         result[key] = val
       }
   }
+  // console.log(result)
   return result;
 }
 
@@ -469,6 +471,13 @@ function unparseQueryMixed_test() {
   };
   expect = '?list_a=1&list_a=2&list_a=3&list_b=1&list_b[2]=2&list_b=3&list_c=1,2,3';
   runTest(obj, expect);
+}
+
+function pushQueryString(query_string) {
+  if (history.pushState) {
+    const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + query_string;
+    window.history.pushState({path:newurl},'',newurl);
+  }
 }
 
 /**
@@ -633,17 +642,17 @@ function getSelectValues(select) {
 }
 
 /**
- * Divides an array into two parts, with the length of each determined by the second and third args.
- * The return is an array of these two parts, where each is either is an array or a single element,
+ * Divides an array or string into two parts, with the length of each determined by the second and third args.
+ * The return is an array of these two parts, where each is either is an array/string or a single element/character,
  * depending on whether its cooresponding size is more than 1 or 1, respectively. 
- * @param {array} arr the array to be divided
- * @param {integer} size0 the size of the first element in return
- * @param {integer} size1 the size of the second element in return
+ * @param {array|string} arr_or_str the array or string to be bisected
+ * @param {integer} size0 the size of the first element in return. If negative, size0 is -num-of-element-from-end to exclude.
+ * @param {integer} size1 the size of the second element in return. If negative, size0 is -num-of-element-from-start to exclude.
  * @returns an array of two elements, each an array if the length is > 1, else it is one element.
  */
-const divideArray = (arr, size0, size1) => [
-  size0 === 1 ? arr[0] : arr.slice(0, size0),
-  size1 === 1 ? arr[arr.length-1] : arr.slice(-size1)
+const bisect = (arr_or_str, size0, size1) => [
+  size0 === 1 ? arr_or_str[0] : arr_or_str.slice(0, size0),
+  size1 === 1 ? arr_or_str[arr_or_str.length-1] : arr_or_str.slice(-size1)
 ]
 
 /**
@@ -673,13 +682,21 @@ function li(child) {
 }
 
 
+function factorial(num) {
+  let rval=1;
+  for (let i = 2; i <= num; i++)
+    rval = rval * i;
+  return rval;
+}
+
+
 /**
  * Returns all permutatins of the elements in an array
  * source: https://stackoverflow.com/a/37580979
  * @param {array} array 
  * @returns array of all permuations of array (wihout repetitions) where is the same size as array
  */
- function permute(array) {
+function permute(array) {
   var length = array.length,
       result = [array.slice()],
       c = new Array(length).fill(0),
@@ -707,37 +724,40 @@ function li(child) {
  * adapted from https://stackoverflow.com/a/37580979
  * @param {array} array 
  * @param {integer} k size of each permutation. Must be <= array.length
+ * @param {function} include_test (optional) function called with each permution as arg and index to be added, returning false to not include it. 
  * @returns array of all permuations of array (wihout repetitions) where is the k
  */
-function permuteChooseK(array, k) {
-  const found = []
-  const result = []
+function permuteChooseR(array, r, include_test) {
+  const found = [];
+  const result = [];
   permute(array).forEach(arr => {
-    const resized = arr.slice(0, k)
-    console.log(resized)
-    const json = JSON.stringify(resized)
-    if (! found.includes(json)) {
-      found.push(json)
-      result.push(resized)
-    } else {
-      console.log("already found")
+    const resized = arr.slice(0, r);
+    const json = JSON.stringify(resized);
+    // console.log(resized, json)
+    if (! found.includes(json) && (!include_test || include_test(resized, result.length))) {
+      found.push(json);
+      result.push(resized);
     }
+    // else console.log(`not found: ${arr}`)
   })
   return result;
 }
 
 
+
+
 /**
- * src: https://www.geeksforgeeks.org/combinations-with-repetitions/
+ * based on: https://www.geeksforgeeks.org/combinations-with-repetitions/
  * @param {array} array 
  * @param {integer} r number of elements in each returned array of combinations
  * @returns  array of arrays where each is combinations (with repetitions) of elements in array and is of size r
  */
-function CombinationRepetition(array,r) {
+function combinationsWithReps(array,r) {
   const n = array.length
+  r ??= n
   const results = []
 
-  function CombinationRepetitionUtil(chosen, array, index, r, start, end) {
+  function combinationsWithRepsUtil(chosen, array, index, r, start, end) {
     // Since index has become r, current combination is ready to be printed, print
     if (index == r) {
       results.push([])
@@ -752,14 +772,14 @@ function CombinationRepetition(array,r) {
     // whether element is already chosen or not) and recur
     for (var i = start; i <= end; i++) {
       chosen[index] = i
-      CombinationRepetitionUtil(chosen, array, index + 1, r, i, end)
+      combinationsWithRepsUtil(chosen, array, index + 1, r, i, end)
     }
     return results
   }
   var chosen = Array.from({ length: r + 1 }, (_, i) => 0) // Allocate memory
 
   // Call the recursive function
-  return CombinationRepetitionUtil(chosen, array, 0, r, 0, n - 1)
+  return combinationsWithRepsUtil(chosen, array, 0, r, 0, n - 1)
 }
 
 

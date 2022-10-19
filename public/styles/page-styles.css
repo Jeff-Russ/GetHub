@@ -15,6 +15,39 @@ textarea, input {
   color: rgb(233, 232, 209);
 }
 
+input[type=checkbox] {
+  position: relative;
+  cursor: pointer;
+}
+
+input[type=checkbox]:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  top: 1px;
+  left: 0;
+  border: 1px solid #555555;
+  border-radius: 3px;
+  background-color: #999;
+}
+
+input[type=checkbox]:checked:after {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 10px;
+  border: solid black;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  position: absolute;
+  top: 2px;
+  left: 6px;
+}
+
 textarea, button, select {
   border-radius: 5px;
   outline: 1px solid rgb(147, 198, 191);
@@ -119,6 +152,7 @@ aside,
   padding: 5px 15px;
 }
 
+/* layout classes */
 .full-width {
   float: none;
   width: 100%;
@@ -132,6 +166,25 @@ aside,
 .third-width {
   float: left;
   width: 33.333%;
+}
+
+.float-left {
+  float: left;
+}
+
+.clearfix {
+  overflow: auto;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.height-auto {
+  height: auto;
+  overflow: visible;
 }
 
 .flash-success {

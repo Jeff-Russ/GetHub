@@ -26,28 +26,28 @@
     <h2 style="margin:0">&nbsp;GitHub API GET Endpoints</h2>
     
   </div>
-  <div id='endpoint_count' class="full-width height-auto clearfix" style="color: rgb(159, 175, 138);">
-  </div>
+  
   
   <div id="endpoints_selectors" class="full-width height-auto clearfix">
-    
     <div class="third-width">
 
       <label for="Sort_by_select" >Sort by <em>a</em> then <em>b</em> then <em>c</em> then <em>d</em></label>
       <select name="Sort_by_select" id="Sort_by_select" style="width: 17.1em;"
-        placeholder="Select a 'Sort By' Option">
+        placeholder="Select a 'Sort By' Option"
+        onchange="console.log('Sort_by_select', this.selectedOptions)">
         <!-- js -->
       </select>
 
       <label for="Sort_dir_select" style="display: block;">Sort Directions</label>
       <select name="Sort_dir_select" id="Sort_dir_select" style="width: 17.1em;"
-        placeholder="Select Sort Directions">
+        placeholder="Select Sort Directions"
+        onchange="console.log('Sort_dir_select', this.selectedOptions)">
         <!-- js -->
       </select>
       
       <label for="show_categories_select" style="display: block;">Show Categories</label>
       <select name="show_categories_select" id="show_categories_select" style="width: 267px;"
-        multiple multiselect-search="false" 
+        multiple multiselect-search="true" 
         multiselect-select-all="true" 
         multiselect-max-items="10" placeholder="Select Categories to Show">
         <!-- js -->
@@ -57,25 +57,27 @@
       <select name="show_apis_select" id="show_apis_select" style="width: 267px;"
         multiple multiselect-search="true" 
         multiselect-select-all="true" 
-        multiselect-max-items="100" placeholder="Select APIs to Show">
+        multiselect-max-items="100" placeholder="Select APIs to Show"
+        onchange="console.log('show_apis_select', this.selectedOptions)">
         <!-- js -->
       </select>
 
     </div>
-    
     <div class="third-width" style="margin-left: 8em;">
 
       <label for="show_params_select" style="display: block;">Required Parameters</label>
       <select name="show_params_select" id="show_params_select" style="width: 377px;"
         multiple multiselect-search="true" 
         multiselect-select-all="true" 
-        multiselect-max-items="1000" placeholder="Show by Required Parameters">
+        multiselect-max-items="1000" placeholder="Show by Required Parameters"
+        onchange="console.log('show_categories_select', this.selectedOptions)">
         <!-- js -->
       </select>
 
       <label for="require_params_select" style="display: block;">Require Parameters?</label>
       <select name="require_params_select" id="require_params_select" style="width: 377px;"
-        placeholder="Select an Option">
+        placeholder="Select an Option"
+        onchange="console.log('Sort_dir_select', this.selectedOptions)">
         <!-- js -->
       </select>
 
@@ -209,34 +211,32 @@ function makeEndpointsSelectors(max_sorts=3) {
       if (htmlCollection) {
         let selected = [...htmlCollection].map(option_el => option_el.innerText)
 
-        // get the right place in endpointsMenuSettings.selected 
-        const ksplit = key.split('_') // to put selected_options:
+        // get the right place in endpointsMenuSettings.selected to put selected_options:
+        const props = key.split('.')
 
-        if (ksplit.length === 2) { // endpointsMenuSettings.selected['Sort']
-          let sort_setting = [...endpointsMenuSettings.selected.Sort]
-          const selected_sorts = selected[0].trim().split(/\s+/);
-          const len = Math.min(selected.length, sort_setting.length)
-          if (ksplit[1] === 'by') {
-            for (let i = 0; i < len; i++) {
-              sort_setting[i] =  selected_sorts[i] + sort_setting[i].slice(-2)
-            }
-          } else { //if (ksplit[1] === 'dir') {
-            for (let i = 0; i < len; i++) {
-              sort_setting[i] = sort_setting[i].slice(0, -1) + selected_sorts[i]
-            }
+        if (props.length === 1){
+          // endpointsMenuSettings.selected.Sort
+          const [ , which ] = props[0].split('_');
+          if (which === 'by') {
+            console.log(`Sort by change to `);
           }
-          selected_obj.Sort = sort_setting
-          console.log(`currently:\n${[...endpointsMenuSettings.selected.Sort]} Sort by change to:\n${sort_setting}`);
-        }
-        else { // endpointsMenuSettings.selected['Show.*']
-            selected_obj[key] = selected;
-          // console.log('selected_obj:',JSON.stringify(selected_obj, null, 2))
+          else if (which === 'dir') {
+            console.log(`Sort direction change`);
+          }
+        } else {
+          // endpointsMenuSettings.selected.Show...
+          
+          selected_obj.Show = {};
+          if (props[1] === 'Parameters') {
+            selected_obj.Show.Parameters = { [props[2]]: selected }
+          } else {
+            selected_obj.Show[props[1]] = selected;
+          }
+          console.log(JSON.stringify(selected_obj, null, 2))
+
         }
       }
       refreshEndpointsMenuContents(selected_obj)
-      makeEndpointsMenuCollapsible()
-      setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemplate)
-      makeListEditable(document.getElementById('endpointGET-ol'))
       
     });
 
@@ -257,7 +257,7 @@ function makeEndpointsSelectors(max_sorts=3) {
       return include;
     }
 
-    const sort_options_data = permuteChooseR(sortables, max_sorts, preventSectionHell).sort().reverse();;
+    const sort_options_data = permuteChooseR(sortables, max_sorts, preventSectionHell).sort();
     const direction_options_data = combinationsWithReps(directions,4);
     // console.log(direction_options_data)
 
@@ -308,20 +308,22 @@ function makeEndpointsSelectors(max_sorts=3) {
 
   function appendShowOptions() {
 
-    /*{
-      'Show.Category': [many],
-      'Show.API': [many],
-      'Show.Parameters.selections': [many]
-      'Show.Parameters.Require': [one],
-      'Sort': [many]
-      } */
-
+    /* Show: {
+      Category: endpoints_json.categories,  // an array: multiple selections but not none
+      API: Object.keys(endpoints_json.apis),// an array: multiple selections but not none
+      Parameters: {
+        Require: ['Any', 'All'], // user picks one
+        selections: ["None", ...endpoints_json.parameters],// an array: multiple selections, allow all and none
+      }
+    } */
     const {
-      'Show.Category': categories,
-      'Show.API': apis,
-      'Show.Parameters.selections': params,
-      'Show.Parameters.Require': params_require,
-    } = endpointsMenuSettings.options
+      Category: categories, 
+      API: apis, 
+      Parameters: {
+        Require: params_require,
+        selections: params
+      }
+    } = endpointsMenuSettings.options.Show;
 
     const option = opt => `<option>${opt}</option>`
 
@@ -359,11 +361,7 @@ document.addEventListener("DOMContentLoaded", function() {
   makeEndpointsMenuCollapsible()
   setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemplate)
   makeListEditable(document.getElementById('endpointGET-ol'))
-
-
   parseQueryStringEndpoints(true, true)  
-
-
   document.getElementById('endpointGET-submit').addEventListener('click', handleClickGET)
 
 });
