@@ -90,7 +90,7 @@ function makeEndpointsMenuCollapsible() {
   })
 }
 
-function setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemplate) {
+function setupEndpointsMenuSelection(addEndpointValidToGETList, addEndpointTemplateToGETList) {
 
   const parents = document.querySelectorAll('div#endpoints-menu > ul > li > ul > li')
   parents.forEach((parent_li) => 
@@ -165,11 +165,11 @@ function setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemp
           endpoints_menu.classList.add("endpoint-selected-mode");
         
           if (select_btn.classList.contains('api-endpoint')) {
-            if (select_btn.classList.contains('valid') && clickApiEndpointValid) {
-              clickApiEndpointValid(select_btn)
+            if (select_btn.classList.contains('valid') && addEndpointValidToGETList) {
+              addEndpointValidToGETList(select_btn.innerText)
 
-            } else if ((select_btn.classList.contains('template') && clickApiEndpointTemplate)) {
-              clickApiEndpointTemplate(select_btn)
+            } else if ((select_btn.classList.contains('template') && addEndpointTemplateToGETList)) {
+              addEndpointTemplateToGETList(select_btn.innerText)
             }
           }
         }
@@ -181,10 +181,11 @@ function setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemp
 const endpointPreview = (endpoint) => 
   `<a class="endpoint-preview" href="https://api.github.com${endpoint}" target="_blank"><a>`
 
-function clickApiEndpointValid(btn) {
-  const endpoint = (typeof btn === 'string') ? btn : btn.innerText;
-  console.log(`clickApiEndpointValid on "${endpoint}"`)
-  const endpointGET_ol = document.getElementById('endpointGET-ol')
+
+function addEndpointValidToGETList(endpoint) {
+  // const endpoint = (typeof btn === 'string') ? btn : btn.innerText;
+  console.log(`addEndpointValidToGETList on "${endpoint}"`)
+  const endpointGET_ol = document.getElementById('endpoints_get_list')
   const endpoint_preview = endpointPreview(endpoint)
   // console.log(endpoint_preview)
   endpointGET_ol.insertAdjacentHTML( 'beforeend', `<li endpoint="${endpoint}"><span class="endpoint">${endpoint}<span contenteditable> </span></span>${endpoint_preview}</li>` );
@@ -192,33 +193,32 @@ function clickApiEndpointValid(btn) {
 }
 
 
-function clickApiEndpointTemplate(btn) {
-  const text = (typeof btn === 'string') ? btn : btn.innerText
-  const endpoint = text.replace(/{([^a-zA-Z0-9+])/, '$1{');
-  console.log(`clickApiEndpointTemplate on "${endpoint}"`)
+function addEndpointTemplateToGETList(endpoint) {
+  // const text = (typeof btn === 'string') ? btn : btn.innerText
+  endpoint = endpoint.replace(/{([^a-zA-Z0-9+])/, '$1{');
+  console.log(`addEndpointTemplateToGETList on "${endpoint}"`)
   const endpoint_html = endpoint.split(/(\{.*?\})/g).reduce(
     (a,s)=> (s[0] !== '{' ? a+s : `${a}<span contenteditable orig=${s}>${s}</span>`),
     ''
   );
   const endpoint_preview = endpointPreview(endpoint)
   // console.log(endpoint_preview)
-  const endpointGET_ol = document.getElementById('endpointGET-ol')
+  const endpointGET_ol = document.getElementById('endpoints_get_list')
   endpointGET_ol.insertAdjacentHTML( 'beforeend', `<li endpoint="${endpoint}"><span class="endpoint">${endpoint_html}<span contenteditable> </span></span>${endpoint_preview}</li>` );
   makeListEditable(endpointGET_ol)
-  
 }
 
 function handleClickApiEndpointValid(event) {
   console.log('handleClickApiEndpointValid')
-  clickApiEndpointValid(event.target)
+  addEndpointValidToGETList(event.target.innerText)
 }
 function handleClickApiEndpointTemplate(event) {
   console.log('handleClickApiEndpointTemplate')
-  clickApiEndpointTemplate(event.target)  
+  addEndpointTemplateToGETList(event.target.innerText)  
 }
 
 async function handleClickGET(event/*ignored*/, update_query_string=true) {
-  const endpoints_list = document.getElementById('endpointGET-ol')
+  const endpoints_list = document.getElementById('endpoints_get_list')
 
   const endpoint_spans = Array.from(endpoints_list.querySelectorAll('span.endpoint'))
   selected_URLs = endpoint_spans.map(span => `https://api.github.com${span.innerText.trim()}`) 
@@ -231,34 +231,36 @@ async function handleClickGET(event/*ignored*/, update_query_string=true) {
         fetch(endpoint).then(res => res.ok ? res.json() : {ERROR: res.status})
       )
     ));
+    var res_error = false;
     rendered_json = responses.reduce( (ob, res, idx) => { // rendered_json is global
       if ("ERROR" in res) {
+        res_error = true;
 
-        const bad_li = document.querySelector(`#endpointGET-ol > li:nth-child(${idx+1})`);
-        const bad_li_sizing = bad_li.getBoundingClientRect()
+        const bad_li = document.querySelector(`#endpoints_get_list > li:nth-child(${idx+1})`);
+        // const bad_li_sizing = bad_li.getBoundingClientRect()
+        // document.getElementById('endpoints_get_list')
 
-        document.getElementById('endpointGET-ol')
-        console.log()
-
-        flashContentAndCSSClass(bad_li, `ERROR: ${res.ERROR}`, 'flash-fail', 2000);
+        flashContentAndCSSClass(...[bad_li, , 'flash-fail', 2000]);
+        return ob
       }
-      return  {...ob, [`${idx} $){selected_URLs[idx].slice(22)}`]: objectifyArray(res)}
+      return  {...ob, [`${idx} ${selected_URLs[idx].slice(22)}`]: objectifyArray(res)}
     }, {});
-    const api_response_el = document.getElementById("api-response")
-    api_response_el.innerHTML = '';
-    renderjson.set_icons("▶", "▼")
-    renderjson.set_show_to_level(3)
-    api_response_el.appendChild(renderjson(rendered_json));
-    linkify(handleClickApiEndpointValid, handleClickApiEndpointTemplate);
-    // if (errors.length) throw new AggregateError(errors, "fetch failed!");
+    if (!res_error) {
+      const api_response_el = document.getElementById("api-response")
+      api_response_el.innerHTML = '';
+      renderjson.set_icons("▶", "▼")
+      renderjson.set_show_to_level(3)
+      api_response_el.appendChild(renderjson(rendered_json));
+      linkify(handleClickApiEndpointValid, handleClickApiEndpointTemplate);
+      // if (errors.length) throw new AggregateError(errors, "fetch failed!");
+      if (update_query_string) {
+        selectedEndpointsToQueryString()
+      }
+    }
   }
   catch(err) {
     console.error("WE GOT an ERROR", err);
-  }
-  finally {
-    if (update_query_string) {
-      selectedEndpointsToQueryString()
-    }
+    flashContentAndCSSClass(...[document.getElementById('endpoints_get_list'), , 'flash-fail', 2000]);
   }
 }
 

@@ -114,12 +114,12 @@ function makeListEditable(list_elem, make_all_draggable=true, make_all_deletable
     if (e.stopPropagation) { e.stopPropagation();  } // Stops some browsers from redirecting.
 
     // Don't do anything if dropping the same movable we're dragging.
-    if (dragSrcEl != this) { // this/e.target is current target element.
+    if (dragSrcEl != this && dragSrcEl !== null) { // this/e.target is current target element.
       // Set the source movable's HTML to the HTML of the movable we dropped on.
       this.parentNode.removeChild(dragSrcEl);
-      var dropHTML = e.dataTransfer.getData('text/html');
+      const dropHTML = e.dataTransfer.getData('text/html');
       this.insertAdjacentHTML('beforebegin',dropHTML);
-      var dropElem = this.previousSibling;
+      const dropElem = this.previousSibling;
 
       dropElem.classList.add('drop-confirm')
       setTimeout(() => { dropElem.classList.remove('drop-confirm'); }, 1000)

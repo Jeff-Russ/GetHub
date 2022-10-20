@@ -18,7 +18,7 @@
   padding-right: 8px;
 }
 
-#endpoints > #endpointGET {
+#endpoints > #endpoints-get {
   position: relative;
   display: inline-block;
   height: auto;
@@ -73,8 +73,8 @@
   background-color: #468a59;
 }
 
-#endpointGET button#endpointGET-submit {
-  /* move submit button to right of #endpointGET container */
+#endpoints-get button#endpoints-get-submit {
+  /* move submit button to right of #endpoints-get container */
   position: relative;
   float: right;
   background-color: #5c5858; /* default button color */
@@ -83,63 +83,65 @@
   margin-right: 0;
 }
 
-#endpointGET:has(ol:empty) button {
+#endpoints-get:has(ol:empty) button {
   /* If there are no li we hide button: */
   display: none;
 }
 
-#endpointGET:has(ol:empty):before {
+#endpoints-get:has(ol:empty):before {
   /* click and endpoint to add it here and, if needed, edit path segments."; */
   content: "\00a0\00a0 click an endpoint to add it here and, if needed, edit path segments.";
 }
 
-#endpointGET:has(ol:has(li)) button {
+#endpoints-get:has(ol:has(li)) button {
   /* If there are li, we show button */
   display: inline-block;
 }
 
-#endpointGET-ol span[contenteditable] {
-  border: 1px solid #799de0;
-  color: #a6c1f4;
-  background-color: rgba(28, 107, 49, 0.5);//#e2e3dc;
-}
+#endpoints_get_list 
 
-#endpointGET-ol {
-  /* prevent ugly empty space on left of #endpointGET container due to ul */
+#endpoints_get_list {
+  /* prevent ugly empty space on left of #endpoints-get container due to ul */
   padding-inline-start: 2px; /*overrides user agent stylesheet (40px) */
   font-size: 16px;
   margin: 0;
 }
 
-#endpointGET-ol > li {
+#endpoints_get_list > li {
   /* not working? was it already pre? */
   white-space: pre;
-  cursor: pointer;
+  cursor: default;
   line-height: 1.4em;
+
+  span.endpoint {
+    // border: 1px solid #dce2e3;
+    span[contenteditable] {
+      cursor: text; 
+      border: 1px solid #799de0;
+      color: #a6c1f4;
+      background-color: rgba(28, 107, 49, 0.5);//#e2e3dc;
+    }
+  } 
 }
 
-#endpointGET-ol span.endpoint {
-  // border: 1px solid #dce2e3;
-}
-
-#endpointGET-ol a {
+#endpoints_get_list a {
   float: right;
 }
 
-#endpointGET-ol:has(li:only-of-type) {
+#endpoints_get_list:has(li:only-of-type) {
   /* hide the fact that we have a list when only one li */
-  list-style: none;
+  // list-style: none;
 }
 
-#endpointGET-ol:not(:has(li:only-of-type)) {
+#endpoints_get_list:not(:has(li:only-of-type)) {
   /* If there is only one li, we will hide the li number
   What is -1? It makes first item be 0 because 1 -1 = 0 */
   counter-reset: endpointGET_li_counter -1;
   list-style-type: none;
 }
 
-#endpointGET-ol:not(:has(li:only-of-type)) li:before {
-  /* #endpointGET-ol li { display: block; } */
+#endpoints_get_list:not(:has(li:only-of-type)) li:before {
+  /* #endpoints_get_list li { display: block; } */
   content: counter(endpointGET_li_counter) " ";
   counter-increment: endpointGET_li_counter;
   float: left;

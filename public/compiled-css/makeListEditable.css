@@ -24,11 +24,20 @@
   box-shadow: inset 0 0 15px rgba(108, 237, 196, 0.5);
   transition: box-shadow 500ms;
 }
+.draggable_list_items li:first-child:not(:only-child) button[draggable] {
+  cursor: s-resize;
+}
 .draggable_list_items li:first-child:not(:only-child) button[draggable]:after {
   content: "↓";
 }
+.draggable_list_items li:not(:first-child):not(:last-child) button[draggable] {
+  cursor: ns-resize;
+}
 .draggable_list_items li:not(:first-child):not(:last-child) button[draggable]:after {
   content: "⇅";
+}
+.draggable_list_items li:last-child:not(:only-child) button[draggable] {
+  cursor: n-resize;
 }
 .draggable_list_items li:last-child:not(:only-child) button[draggable]:after {
   content: "↑";
@@ -43,10 +52,6 @@
   height: 15px;
   vertical-align: text-top;
   text-align: left;
-}
-.draggable_list_items button[draggable] {
-  /*This <button> element is added by JS */
-  cursor: grabbing;
 }
 
 /*This <button> elements are added by JS */
@@ -72,6 +77,7 @@
 
 .deletable_list_items button[deletable]:after {
   /* This will render the 'X' */
+  cursor: no-drop;
   content: "×";
   font-size: 1.2em;
   line-height: 1.1em;

@@ -5,10 +5,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="styles/page-styles.css" rel="stylesheet" type="text/css">
-  <link href="styles/endpoints.css" rel="stylesheet" type="text/css">
-  <link href="styles/makeListEditable.css" rel="stylesheet" type="text/css">
-  <link href="styles/api-response.css" rel="stylesheet" type="text/css">
+  <link href="compiled-css/page-styles.css" rel="stylesheet" type="text/css">
+  <link href="compiled-css/endpoints.css" rel="stylesheet" type="text/css">
+  <link href="compiled-css/makeListEditable.css" rel="stylesheet" type="text/css">
+  <link href="compiled-css/api-response.css" rel="stylesheet" type="text/css">
   
   <title>GetHub — Query the GitHub API</title>
  
@@ -80,11 +80,11 @@
  
   </div>
   
-  <div id="endpointGET" class="full-width float-left"> 
+  <div id="endpoints-get" class="full-width float-left"> 
     <!-- <li> will  be inserted and later on, each will have some filter rules -->
-    <ol id="endpointGET-ol"></ol>
+    <ol id="endpoints_get_list"></ol>
     <br>
-    <button id="endpointGET-submit" style="border: 0.5px solid #468a59;">
+    <button id="endpoints-get-submit" style="border: 0.5px solid #468a59;">
       <strong><code >GET</code></strong>
     </button>
   </div>
@@ -111,7 +111,7 @@
 
 function selectedEndpointsToQueryString(endpoints_list, pushState=true) {
   // needs pushQueryString (in helpers.js)
-  endpoints_list ??= document.getElementById('endpointGET-ol')
+  endpoints_list ??= document.getElementById('endpoints_get_list')
   const query_string = '?endpoint=' + [...endpoints_list.querySelectorAll('li')].map(li=>{
     const user_values = [...li.querySelectorAll('span > span[contenteditable')].map(editable => {
       return `"${editable.innerText}"`
@@ -142,17 +142,17 @@ function parseQueryStringEndpoints(list_el_to_populate=false, get=false) {
   if (list_el_to_populate) {
     // console.log('populating endpoints to GET list')
     if (list_el_to_populate === true) {
-      list_el_to_populate = document.getElementById('endpointGET-ol') // default if true
+      list_el_to_populate = document.getElementById('endpoints_get_list') // default if true
     }
     for (const endpt of endpts) {
       if (endpt.is_template) {
-        clickApiEndpointTemplate(endpt.endpoint)
+        addEndpointTemplateToGETList(endpt.endpoint)
         const editables = list_el_to_populate.querySelectorAll(`li:last-of-type > span.endpoint > span[contenteditable]`)
         editables.forEach((editable, idx) => {
           editable.innerText = endpt.editables[idx] || ''
         })
       }
-      else clickApiEndpointValid(endpt.endpoint)
+      else addEndpointValidToGETList(endpt.endpoint)
     }
     if (get) {
       handleClickGET(...[,false]) // false means don't update query string
@@ -217,8 +217,8 @@ function makeEndpointsSelectors(max_sorts=3) {
       }
       refreshEndpointsMenuContents(selected_obj)
       makeEndpointsMenuCollapsible()
-      setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemplate)
-      makeListEditable(document.getElementById('endpointGET-ol'))
+      setupEndpointsMenuSelection(addEndpointValidToGETList, addEndpointTemplateToGETList)
+      makeListEditable(document.getElementById('endpoints_get_list'))
       
     });
 
@@ -293,6 +293,21 @@ var //endpointsMenuSettings = {},
     rendered_json;  // combined GET responses as full object (no arrays)
 
 
+
+class Get {
+
+  get endpoints_get_list() {
+    return this.log[this.log.length - 1];
+  }
+  async getAndDisplay(update_query_string=true) {
+    return handleClickGET(...[,update_query_string]);
+  }
+  get responses() {
+    return responses
+  }
+}
+
+
 //// Start Execution ////////////////////
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -304,14 +319,14 @@ document.addEventListener("DOMContentLoaded", function() {
   makeEndpointsSelectors(4)
     
   makeEndpointsMenuCollapsible()
-  setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemplate)
-  makeListEditable(document.getElementById('endpointGET-ol'))
+  setupEndpointsMenuSelection(addEndpointValidToGETList, addEndpointTemplateToGETList)
+  makeListEditable(document.getElementById('endpoints_get_list'))
 
 
   parseQueryStringEndpoints(true, true)  
 
 
-  document.getElementById('endpointGET-submit').addEventListener('click', handleClickGET)
+  document.getElementById('endpoints-get-submit').addEventListener('click', handleClickGET)
 
 });
   

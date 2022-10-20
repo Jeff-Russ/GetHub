@@ -18,6 +18,9 @@ z_old/
 jail-test.js
 
 
+## Sass ## 
+
+public/compiled-css/*.css.map
 
 
 ### NODE ###
