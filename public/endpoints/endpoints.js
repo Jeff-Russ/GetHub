@@ -1,6 +1,6 @@
 const colors = {
-  opened_bg: '#6494b6', // should match hovered / navigated button color in css
-  closed_bg: '#707070'  // should match default button color set in css
+  opened_bg: '#3d6480', // should match hovered / navigated button color in css
+  closed_bg: '#5c5858'  // should match default button color set in css
 }
 
 
@@ -101,7 +101,7 @@ function setupEndpointsMenuSelection(clickApiEndpointValid, clickApiEndpointTemp
         console.log(`event listener called from setupEndpointsMenuSelection`)
         function setDisplayOnBtnsListSiblings(select_btn, display) {
         /*<ul>
-            <li><button class="picker-menu-btn"><strong>Additional Endpoints</strong></button> 
+            <li><button class="picker-menu-btn">Additional Endpoints</button> 
             <ul> <!-- great_ul -->
               <li><button class="picker-submenu-btn">activity</button>&nbsp<a href="https://docs.github.com/en/rest/activity" target="_blank"></a>
                 <ul> !-- outer_ul -->
@@ -229,9 +229,19 @@ async function handleClickGET(event/*ignored*/, update_query_string=true) {
         fetch(endpoint).then(res => res.ok ? res.json() : {ERROR: res.status})
       )
     ));
-    rendered_json = responses.reduce( (ob, res, idx) => ( // rendered_json is global
-      {...ob, [`${idx} ${selected_URLs[idx].slice(22)}`]: objectifyArray(res)}
-    ), {});
+    rendered_json = responses.reduce( (ob, res, idx) => { // rendered_json is global
+      if ("ERROR" in res) {
+
+        const bad_li = document.querySelector(`#endpointGET-ol > li:nth-child(${idx+1})`);
+        const bad_li_sizing = bad_li.getBoundingClientRect()
+
+        document.getElementById('endpointGET-ol')
+        console.log()
+
+        flashContentAndCSSClass(bad_li, `ERROR: ${res.ERROR}`, 'flash-fail', 2000);
+      }
+      return  {...ob, [`${idx} $){selected_URLs[idx].slice(22)}`]: objectifyArray(res)}
+    }, {});
     const api_response_el = document.getElementById("api-response")
     api_response_el.innerHTML = '';
     renderjson.set_icons("▶", "▼")
@@ -267,7 +277,7 @@ function endpointsMenuSettings(selected) { // resist the urge nest this function
   endpointsMenuSettings.ALL = {
     'Show.Category': [...endpoints_json.categories],
     'Show.API': [...Object.keys(endpoints_json.apis)],
-    'Show.Parameters.selections': [...endpoints_json.parameters],
+    'Show.Parameters.selections': ['Show endpoints with no parameters',...endpoints_json.parameters],
     'Show.Parameters.Require': ['Any'],
     'Sort': [ 'Category ▲', 'Parameters ▼', 'API ▼', 'Endpoint ▼'],
   };
@@ -331,7 +341,7 @@ function refreshEndpointsMenuContents(selected) {
     // has defined selections, or just defaults are set.
 
     // const { Show, Sort } = endpointsMenuSettings.selected;
-    console.log('sorting and filtering endpoints')
+    // console.log('sorting and filtering endpoints')
     const s = endpointsMenuSettings.selected;
 
     const all_params = s['Show.Parameters.Require'][0] === 'All';
@@ -422,11 +432,11 @@ function refreshEndpointsMenuContents(selected) {
       const menu = i ? 'submenu' : 'menu'
 
       if (sections_order[i] === 'Parameters') {
-        get[section].picker = endp => `<button class="picker-${menu}-btn"><strong>${endp.parameters.length} Parameters</strong></button>`;
+        get[section].picker = endp => `<button class="picker-${menu}-btn">${endp.parameters.length} Parameters</button>`;
         get[section].current = endp => endp.parameters.length;
       }
       else if (sections_order[i] === 'Category') {
-        get[section].picker = endp => `<button class="picker-${menu}-btn"><strong>${endp.category}</strong></button>`;
+        get[section].picker = endp => `<button class="picker-${menu}-btn">${endp.category}</button>`;
         get[section].current = endp => endp.category;
       }
       else if (sections_order[i] === 'API') {
@@ -442,8 +452,8 @@ function refreshEndpointsMenuContents(selected) {
     const endpoints_ul = ul();
 
     const endpointHtml = (endp, make_api_links) => {
-      const is_valid = !endp.parameters.length
-      const type = is_valid ? 'template' : 'valid';
+      const is_valid = endp.parameters.length === 0
+      const type = is_valid ? 'valid' : 'template';
       const preview = is_valid ? ('&nbsp;'+ext_link(`https://api.github.com${endp.endpoint}`)) : ''
       const endp_doc = ext_link(endp.endpoint_doc_link, 'docs');
       const api_doc = make_api_links 

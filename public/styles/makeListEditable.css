@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /* .draggable_list_items > li {
-  border: 1px solid black;
+  border: 1px solid #dce2e3;
 } */
 .draggable_list_items {
   display: inline-block;
@@ -35,10 +35,10 @@
 }
 .draggable_list_items button {
   float: left;
-  padding-left: 2px;
-  padding-right: 2px;
-  margin-left: 1px;
-  margin-right: 1px;
+  padding-left: 1px;
+  padding-right: 1px;
+  margin-left: 0px;
+  margin-right: 0px;
   width: 15px;
   height: 15px;
   vertical-align: text-top;

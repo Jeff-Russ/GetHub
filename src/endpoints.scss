@@ -11,7 +11,7 @@
   overflow-y: scroll;
   height: auto;
   width: auto;
-  border: 1px solid #6494b6;
+  border: 1px solid #3d6480;
   border-radius: 8px;
   padding-top: 0px;
   padding-bottom: 0px;
@@ -23,16 +23,17 @@
   display: inline-block;
   height: auto;
   width: auto;
-  /* border: 2px solid #6494b6; */
+  /* border: 2px solid #3d6480; */
   background-color: #2f485a;
   border-radius: 8px;
-  padding: 0 20px 10px 0;
+  padding: 0 8px 8px 0;
   margin: 10px;
+  margin-bottom: 2px;
 }
 
 #endpoints-menu button {
   /* default button color */
-  background-color: #707070;
+  background-color: #5c5858;
   border-radius: 5px;
   border-width: 0px;
   margin-right: 0;
@@ -64,19 +65,19 @@
 #endpoints-menu > ul > li > ul > li:hover > button,
 #endpoints-menu > ul > li > ul > li:focus-within > button {
   /* hovered / navigated button color */
-  background-color: #6494b6;
+  background-color: #3d6480;
 }
 
 #endpoints-menu > ul > li > ul > li > ul > li > button#endpoint-selected {
   /* THE selected button color */
-  background-color: #64b67b;
+  background-color: #468a59;
 }
 
 #endpointGET button#endpointGET-submit {
   /* move submit button to right of #endpointGET container */
   position: relative;
   float: right;
-  background-color: #707070; /* default button color */
+  background-color: #5c5858; /* default button color */
   border-radius: 5px;
   border-width: 0px;
   margin-right: 0;
@@ -100,12 +101,14 @@
 #endpointGET-ol span[contenteditable] {
   border: 1px solid #799de0;
   color: #a6c1f4;
-  background-color: black;
+  background-color: rgba(28, 107, 49, 0.5);//#e2e3dc;
 }
 
 #endpointGET-ol {
   /* prevent ugly empty space on left of #endpointGET container due to ul */
-  padding-inline-start: 30px; /*overrides user agent stylesheet (40px) */
+  padding-inline-start: 2px; /*overrides user agent stylesheet (40px) */
+  font-size: 16px;
+  margin: 0;
 }
 
 #endpointGET-ol > li {
@@ -116,7 +119,7 @@
 }
 
 #endpointGET-ol span.endpoint {
-  border: 1px solid black;
+  // border: 1px solid #dce2e3;
 }
 
 #endpointGET-ol a {
