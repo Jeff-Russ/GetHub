@@ -158,6 +158,7 @@ function parseQueryStringEndpoints(list_el_to_populate=false, get=false) {
       handleClickGET(...[,false]) // false means don't update query string
     }
   } 
+  // console.log(JSON.stringify(endpts,null,2))
   return endpts
 }
 
@@ -165,7 +166,6 @@ function makeEndpointsSelectors(max_sorts=3) {
   // this must be called after endpointsMenuSettings is called (and endpointsMenuSettings.options are set)
   // and should not be called more than once!
   // About max_sorts: there are actually 4 possible (endpointsMenuSettings.options.Sort.length). TODO: try with 4
-
 
 
   const select = {
@@ -176,19 +176,6 @@ function makeEndpointsSelectors(max_sorts=3) {
     'Show.Parameters.selections': document.getElementById('show_params_select'),
     'Show.Parameters.Require': document.getElementById('require_params_select'),
   }
-
-
-
-  // Show: { 
-  //   Category: [...endpoints_json.categories],
-  //   API: Object.keys(endpoints_json.apis),
-  //   Parameters: {
-  //     selections: ["None", ...endpoints_json.parameters],
-  //     Require: ['Any'], 
-  //   },
-  // },
-  // Sort: [ 'Category ▲', 'Parameters ▼', 'API ▼'],
-
 
 
   appendSortOptions(max_sorts)
@@ -272,44 +259,9 @@ function makeEndpointsSelectors(max_sorts=3) {
     select.Sort_by.innerHTML = sort_options_html.join('\n');
     select.Sort_dir.innerHTML = direction_options_html.join('\n');
 
-
-    /*
-    sort_options = [
-      [ 'API', 'Category', 'Endpoint', 'Parameters' ],
-      [ 'API', 'Category', 'Parameters', 'Endpoint' ],
-      [ 'API', 'Parameters', 'Category', 'Endpoint' ],
-      [ 'API', 'Parameters', 'Endpoint', 'Category' ],
-      [ 'Category', 'API', 'Endpoint', 'Parameters' ],
-      [ 'Category', 'API', 'Parameters', 'Endpoint' ],
-      [ 'Category', 'Parameters', 'API', 'Endpoint' ],
-      [ 'Category', 'Parameters', 'Endpoint', 'API' ],
-      [ 'Parameters', 'API', 'Category', 'Endpoint' ],
-      [ 'Parameters', 'API', 'Endpoint', 'Category' ],
-      [ 'Parameters', 'Category', 'API', 'Endpoint' ],
-      [ 'Parameters', 'Category', 'Endpoint', 'API' ]
-    ]
-
-    direction_options[
-      [ '▼', '▼', '▼', '▼' ],
-      [ '▼', '▼', '▼', '▲' ],
-      [ '▼', '▼', '▲', '▲' ],
-      [ '▼', '▲', '▲', '▲' ],
-      [ '▲', '▲', '▲', '▲' ]
-    ]
-
-    */
-
   }
 
   function appendShowOptions() {
-
-    /*{
-      'Show.Category': [many],
-      'Show.API': [many],
-      'Show.Parameters.selections': [many]
-      'Show.Parameters.Require': [one],
-      'Sort': [many]
-      } */
 
     const {
       'Show.Category': categories,

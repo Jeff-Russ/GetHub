@@ -1,4 +1,4 @@
-const { token } = require('./secrets/gh-api-token.js');
+const { token } = require('./secrets.js');
 
 exports.gh_api_options = {
   headers: {

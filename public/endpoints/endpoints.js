@@ -1,3 +1,5 @@
+////  Endpoints Menu (#endpoints-menu) ////////////////////////////////////////////////////////////
+
 const colors = {
   opened_bg: '#3d6480', // should match hovered / navigated button color in css
   closed_bg: '#5c5858'  // should match default button color set in css
@@ -261,6 +263,8 @@ async function handleClickGET(event/*ignored*/, update_query_string=true) {
 }
 
 
+////  Endpoints Menu Settings (#endpoints_selectors) ////////////////////////////////////////////////////////////
+
 
 /**
  * initalizes endpointsMenuSettings global if needed and sets the current selection within it to
@@ -404,8 +408,6 @@ function refreshEndpointsMenuContents(selected) {
   }
 
 
-
-
   function displayEndpoints() {
     // for initial display on first call, then subsequent calls 
     // update view from endpointsMenuSettings.selected
@@ -461,7 +463,6 @@ function refreshEndpointsMenuContents(selected) {
       return `<button class="picker-select-btn api-endpoint ${type}">${endp.endpoint}</button>${preview}&nbsp;${endp_doc}${api_doc}`;
     }
 
-
     for (const endpoint of selectEndpoints.endpoints) {
       const new_menu = get.menu.current(endpoint) !== get.menu.previous;
       if (new_menu) {
@@ -483,12 +484,9 @@ function refreshEndpointsMenuContents(selected) {
       current_submenu_li_ul.appendChild(li(endpointHtml(endpoint, make_api_links)));
     }
   
-
     document.getElementById('endpoints-menu').innerHTML = ''
     document.getElementById('endpoints-menu').appendChild(endpoints_ul)
     document.getElementById('endpoint_count').innerText = `Now showing ${selectEndpoints.endpoints.length} endpoints.`
-    
-    
   }
 }
 

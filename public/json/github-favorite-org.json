@@ -1,4 +1,4 @@
-exports.companies = [ // In order of most desirable to contribute to to least.
+[
   {
     "name": "edX Inc.",
     "url": "https://github.com/edx",
