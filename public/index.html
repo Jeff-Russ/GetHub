@@ -5,10 +5,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link href="compiled-css/page-styles.css" rel="stylesheet" type="text/css">
-  <link href="compiled-css/endpoints.css" rel="stylesheet" type="text/css">
-  <link href="compiled-css/makeListEditable.css" rel="stylesheet" type="text/css">
-  <link href="compiled-css/api-response.css" rel="stylesheet" type="text/css">
+  <link href="css-compiled/page-styles.css" rel="stylesheet" type="text/css">
+  <link href="css-compiled/endpoints.css" rel="stylesheet" type="text/css">
+  <link href="css-compiled/makeListEditable.css" rel="stylesheet" type="text/css">
+  <link href="css-compiled/api-response.css" rel="stylesheet" type="text/css">
   
   <title>GetHub — Query the GitHub API</title>
  
@@ -96,13 +96,13 @@
 
 <div id="api-response" class="data-linkify full-width">
 </div>
-<script type="module" src="module.js"></script>
-<script src="js/helpers.js"></script>
-<script src="js/multiselect-dropdown.js"></script>
-<script src="endpoints/endpoints.js"></script>
-<script src="api-response/renderjson.js"></script>
-<script src="api-response/linkify.js"></script>
-<script src="makeListEditable/makeListEditable.js"></script>
+<script src="json-module.js" type="module" ></script>
+<script src="js-compiled/helpers.js"></script>
+<script src="js-original/multiselect-dropdown.js"></script>
+<script src="js-original/endpoints.js"></script>
+<script src="js-original/renderjson.js"></script>
+<script src="js-original/linkify.js"></script>
+<script src="js-compiled/makeListEditable.js"></script>
 
 <script>
 
@@ -283,9 +283,9 @@ function makeEndpointsSelectors(max_sorts=3) {
 //// GLOBALS ////////////////////
 
 
-var endpoints_json = window.endpoints_json; // set in public/module.js
+var endpoints_json = window.endpoints_json; // set in module.js
 
-// all of these are set in public/endpoints.js:
+// all of these are set in endpoints.js:
 var //endpointsMenuSettings = {},
     // selectEndpoints.endpoints = [], // this is endpoints_json.endpoints, filtered and sorted
     selected_URLs, // used cleaning up endpoints menu when selection is made

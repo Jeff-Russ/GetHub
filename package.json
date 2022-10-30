@@ -8,16 +8,20 @@
   },
   "scripts": {
     "start": "node .",
-    "dev": "nodemon . & npm run scss",
-    "scss": "sass --watch src/:public/compiled-css/",
+    "dev": "nodemon . & tsc -w & sass -w src/:public/css-compiled/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "concurrently": "^7.5.0",
     "express": "^4.18.1",
     "nodemon": "^2.0.20",
     "octokit": "^2.0.7",
     "sass": "^1.55.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
   }
 }

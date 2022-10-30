@@ -4,23 +4,48 @@
 gh-api-token.js
 
 
-endpoints-rework.js
+### Project Specific: temporary/archived ###
+
+
+z_old/
 Notes-and-studies/
+
 lib/debug-tools.js
 lib/data-object-helpers.js
 lib/KeywordRules-backups.js
 lib/KeywordRules-test.js
+
+endpoints-rework.js
+
 public/code-editor-*-test.html
 public/js/prism.js
 public/styles/hjs-dracula.css
 public/styles/prism-xonokai.css
-z_old/
+
 jail-test.js
 
 
+public/js-compiled/endpoints.js
+public/js-compiled/endpoints.js.map
+public/js-compiled/medium_script.js
+public/js-compiled/medium_script.js.map
+public/js-compiled/tests.js
+public/js-compiled/tests.js.map
+src/tests.ts
+public/medium_test.html
+src/medium_script.ts
+
+
+src/endpoints.ts
+
+
+### VSCode Extension ###
+
+.vscode/
+
 ## Sass ## 
 
-public/compiled-css/*.css.map
+public/css-compiled/*.css.map
 
 
 ### NODE ###
@@ -66,7 +91,7 @@ bower_components
 build/Release
 
 # Dependency directories
-node_modules/
+node_modules
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
