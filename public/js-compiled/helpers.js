@@ -695,6 +695,7 @@ var bisect = function (arr_or_str, size0, size1) { return [
  * @returns newly created HTMLUListElement
  */
 function ul(child) {
+    if (child === void 0) { child = undefined; }
     var node = document.createElement('ul');
     if (typeof child === 'string')
         node.insertAdjacentHTML('beforeend', child);

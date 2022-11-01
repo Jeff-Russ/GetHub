@@ -1,4 +1,4 @@
-function makeListEditable(list_elem:HTMLLIElement, make_all_draggable=true, make_all_deletable=true) {
+function makeListEditable(list_elem:HTMLOListElement, make_all_draggable=true, make_all_deletable=true) {
   // adapted from: https://codepen.io/retrofuturistic/pen/DJWYBv
   // But this is safe to be run multiple times on the same list_elem and you 
   // would do this each time a new <li> is added. (makeListEditable needs the 
@@ -7,10 +7,7 @@ function makeListEditable(list_elem:HTMLLIElement, make_all_draggable=true, make
   if (make_all_draggable) { list_elem.classList.add('draggable_list_items'); }
   if (make_all_deletable) { list_elem.classList.add('deletable_list_items'); }
 
-
   var items:NodeListOf<HTMLLIElement> = list_elem.querySelectorAll('li'); // DO NOT RENAME items
-
-
 
   if (list_elem.classList.contains('draggable_list_items')) {
     [].forEach.call(items, addDraggableButton);

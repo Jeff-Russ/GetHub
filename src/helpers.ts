@@ -713,7 +713,7 @@ const bisect = (arr_or_str:any[]|string, size0:number, size1:number) => [
  * @param {Node|string} child (optional) Node or html string to be added within new element
  * @returns newly created HTMLUListElement
  */
-function ul(child:string|HTMLElement)  {
+function ul(child:(string|HTMLElement|undefined)=undefined)  {
   const node = document.createElement('ul');
   if (typeof child === 'string')
     node.insertAdjacentHTML('beforeend', child);
@@ -726,7 +726,7 @@ function ul(child:string|HTMLElement)  {
 * @param {Node|string} child (optional) Node or html string to be added within new element
 * @returns newly created HTMLLIElement
 */
-function li(child:Node) {
+function li(child:Node|string) {
   const node = document.createElement('li')
   if (typeof child === 'string')
     node.insertAdjacentHTML('beforeend', child);
