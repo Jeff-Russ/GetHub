@@ -1,4 +1,4 @@
-{
+window.endpoints_json = {
   "endpoints": [
     {
       "endpoint": "/repositories",

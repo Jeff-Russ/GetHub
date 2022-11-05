@@ -96,7 +96,9 @@
 
 <div id="api-response" class="data-linkify full-width">
 </div>
-<script src="json-module.js" type="module" ></script>
+<!-- <script src="json-module.js" type="module" ></script> -->
+<script src="data/endpoints_json.js" ></script>
+<script src="data/github_org_json.js" ></script>
 <script src="js-compiled/helpers.js"></script>
 <script src="js-compiled/multiselect-dropdown.js"></script>
 <script src="js-compiled/endpoints.js"></script>
@@ -281,7 +283,7 @@ function makeEndpointsSelectors(max_sorts=3) {
 //// GLOBALS ////////////////////
 
 
-var endpoints_json = window.endpoints_json; // set in module.js
+// var endpoints_json = window.endpoints_json; // set in module.js
 
 // all of these are set in endpoints.js:
 var //endpointsMenuSettings = {},

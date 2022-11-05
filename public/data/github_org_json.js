@@ -1,4 +1,4 @@
-[
+window.github_org_json = [
   {
     "name": "edX Inc.",
     "url": "https://github.com/edx",
