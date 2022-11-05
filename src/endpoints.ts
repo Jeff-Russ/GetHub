@@ -1,19 +1,15 @@
-// Temp types:
-
-type Obj = Record<string, any>
-
 ////  Endpoints Menu (#endpoints-menu) ////////////////////////////////////////////////////////////
 
-const colors = {
-  opened_bg: '#3d6480', // should match hovered / navigated button color in css
-  closed_bg: '#5c5858'  // should match default button color set in css
-}
 
-
-
+// called in index.html
 function makeEndpointsMenuCollapsible() {
+  const colors = {
+    opened_bg: '#3d6480', // should match hovered / navigated button color in css
+    closed_bg: '#5c5858'  // should match default button color set in css
+  }
+  
   // This should probably be a resuable, recursive function to make nested 
-  // lists of arbitray length collapsible But for now,  it's just 
+  // lists of arbitray length collapsible But for now, it's just 
   // for a single use with a list that has two layers of collapsibles
   const menu_list_items = document.querySelectorAll('div#endpoints-menu > ul > li')
 
@@ -95,8 +91,8 @@ function makeEndpointsMenuCollapsible() {
   })
 }
 
-type addEndpoint_ = (endpoint: string) => void;
 
+// called in index.html
 function setupEndpointsMenuSelection(addEndpointValidToGETList:addEndpoint_, addEndpointTemplateToGETList:addEndpoint_) {
 
   const parents:HTMLLIElement[] = Array.from(document.querySelectorAll('div#endpoints-menu > ul > li > ul > li'))
@@ -185,12 +181,13 @@ function setupEndpointsMenuSelection(addEndpointValidToGETList:addEndpoint_, add
   })
 }
 
+// called in  addEndpointValidToGETList and addEndpointTemplateToGETList (both in this file only)
 const endpointPreview = (endpoint:string) => 
   `<a class="endpoint-preview" href="https://api.github.com${endpoint}" target="_blank"><a>`
 
 
 
-
+// called in index.html
 function addEndpointValidToGETList(endpoint:string): void {
   // const endpoint = (typeof btn === 'string') ? btn : btn.innerText;
   console.log(`addEndpointValidToGETList on "${endpoint}"`)
@@ -203,6 +200,7 @@ function addEndpointValidToGETList(endpoint:string): void {
 }
 
 
+// called in index.html
 function addEndpointTemplateToGETList(endpoint:string): void  {
   // const text = (typeof btn === 'string') ? btn : btn.innerText
   endpoint = endpoint.replace(/{([^a-zA-Z0-9+])/, '$1{');
@@ -220,10 +218,13 @@ function addEndpointTemplateToGETList(endpoint:string): void  {
 
 
 
+// called all over but only in this file 
 function handleClickApiEndpointValid(this: HTMLElement, event:MouseEvent) { // only called by JS as handler
   console.log('handleClickApiEndpointValid')
   addEndpointValidToGETList((event.target as HTMLElement).innerText)
 }
+
+// called all over but only in this file 
 function handleClickApiEndpointTemplate(this: HTMLElement, event:MouseEvent) {  // only called by JS as handler
   console.log('handleClickApiEndpointTemplate')
   addEndpointTemplateToGETList((event.target as HTMLElement).innerText)  
@@ -245,7 +246,7 @@ async function handleClickGET(this: HTMLElement/*ignored*/, event:MouseEvent/*ig
     ));
     var res_error = false;
     (<any>window).rendered_json = // (<any>window).rendered_json is global
-    (<any>window).responses.reduce((ob:Obj, res:Obj, idx:number) => { 
+    (<any>window).responses.reduce((ob:JsOb, res:JsOb, idx:number) => { 
       if ("ERROR" in res) {
         res_error = true;
 
@@ -295,7 +296,7 @@ async function handleClickGET(this: HTMLElement/*ignored*/, event:MouseEvent/*ig
 * @param {object} selected If not provided, endpointsMenuSettings.selected = endpointsMenuSettings.defaults
 * @returns endpointsMenuSettings (global, which it also writes to directly)
 */
-const endpointsMenuSettings = Object.assign((selected?:Obj) => {
+const endpointsMenuSettings = Object.assign((selected?:JsOb) => {
   const prev_selected = 
     typeof endpointsMenuSettings.selected === 'object'
       ? JSON.stringify(endpointsMenuSettings!.selected)
@@ -359,7 +360,7 @@ const endpointsMenuSettings = Object.assign((selected?:Obj) => {
 
 
 
-function refreshEndpointsMenuContents(selected?:Obj) {
+function refreshEndpointsMenuContents(selected?:JsOb) {
   // because TS does not hoist const arrow function, and selectEndpoints has to 
   // be just that I have to put the executable part of refreshEndpointsMenuContents 
   // at the bottom of refreshEndpointsMenuContents. So scroll down and see what's up.
@@ -395,7 +396,7 @@ function refreshEndpointsMenuContents(selected?:Obj) {
     })
 
     selectEndpoints.endpoints = multiCriteriaSort(
-      (<any>window).endpoints_json.endpoints.filter((endp:Obj) => {
+      (<any>window).endpoints_json.endpoints.filter((endp:JsOb) => {
         if (!(s['Show.Category'].includes(endp.category))) {
           // console.log(`${endp.category} was not in ${s['Show.Category']}`)
           return false;
@@ -456,23 +457,23 @@ function refreshEndpointsMenuContents(selected?:Obj) {
 
     const make_api_links = !sections_order.includes('API')
     // we won't bother with category buttons since that's just a thing I made up anyway.
-    const get:Obj = {menu: {}, submenu: {}}
+    const get:JsOb = {menu: {}, submenu: {}}
 
 
     for (let [i, section] of Array.from(Object.keys(get).entries())) {
       const menu = i ? 'submenu' : 'menu'
 
       if (sections_order[i] === 'Parameters') {
-        get[section].picker = (endp:Obj) => `<button class="picker-${menu}-btn">${endp.parameters.length} Parameters</button>`;
-        get[section].current = (endp:Obj) => endp.parameters.length;
+        get[section].picker = (endp:JsOb) => `<button class="picker-${menu}-btn">${endp.parameters.length} Parameters</button>`;
+        get[section].current = (endp:JsOb) => endp.parameters.length;
       }
       else if (sections_order[i] === 'Category') {
-        get[section].picker = (endp:Obj) => `<button class="picker-${menu}-btn">${endp.category}</button>`;
-        get[section].current = (endp:Obj) => endp.category;
+        get[section].picker = (endp:JsOb) => `<button class="picker-${menu}-btn">${endp.category}</button>`;
+        get[section].current = (endp:JsOb) => endp.category;
       }
       else if (sections_order[i] === 'API') {
-        get[section].picker = (endp:Obj) => `<button class="picker-${menu}-btn">${endp.api}</button>&nbsp;${ext_link(endp.api_doc_link, 'docs')}`;
-        get[section].current = (endp:Obj) => endp.api;
+        get[section].picker = (endp:JsOb) => `<button class="picker-${menu}-btn">${endp.api}</button>&nbsp;${ext_link(endp.api_doc_link, 'docs')}`;
+        get[section].current = (endp:JsOb) => endp.api;
       }
     }
 
@@ -482,7 +483,7 @@ function refreshEndpointsMenuContents(selected?:Obj) {
 
     const endpoints_ul = ul();
 
-    const endpointHtml = (endp:Obj, make_api_links:boolean) => {
+    const endpointHtml = (endp:JsOb, make_api_links:boolean) => {
       const is_valid = endp.parameters.length === 0
       const type = is_valid ? 'valid' : 'template';
       const preview = is_valid ? ('&nbsp;'+ext_link(`https://api.github.com${endp.endpoint}`)) : ''
@@ -526,8 +527,6 @@ function refreshEndpointsMenuContents(selected?:Obj) {
   }
 }
 
-
-type ClickHander = (this: HTMLElement, event:MouseEvent) => void;
 
 function linkify(handleClickApiEndpointValid:ClickHander, handleClickApiEndpointTemplate:ClickHander) {
   
