@@ -38,9 +38,10 @@ public/medium_test.html
 src/medium_script.ts
 
 
-### VSCode Extension ###
+### VSCode & Extensions ###
 
 .vscode/
+.VSCodeCounter/
 
 ## Sass ## 
 

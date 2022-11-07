@@ -52,7 +52,7 @@ function makeEndpointsMenuCollapsible() {
     })
 
     const sublist_items = menu_li.querySelectorAll('li:has(button.picker-submenu-btn)')
-    const sublist_btns = menu_li.querySelectorAll('button.picker-submenu-btn')
+    // const sublist_btns = menu_li.querySelectorAll('button.picker-submenu-btn')
 
     sublist_items.forEach((sublist_item, sublist_item_idx) => {
       const sublist_btn = sublist_item.querySelector('button.picker-submenu-btn') as HTMLButtonElement
@@ -187,7 +187,7 @@ const endpointPreview = (endpoint:string) =>
 
 
 
-// called in index.html
+// called in index.html and in this file
 function addEndpointValidToGETList(endpoint:string): void {
   // const endpoint = (typeof btn === 'string') ? btn : btn.innerText;
   console.log(`addEndpointValidToGETList on "${endpoint}"`)
@@ -200,7 +200,7 @@ function addEndpointValidToGETList(endpoint:string): void {
 }
 
 
-// called in index.html
+// called in index.html and in this file
 function addEndpointTemplateToGETList(endpoint:string): void  {
   // const text = (typeof btn === 'string') ? btn : btn.innerText
   endpoint = endpoint.replace(/{([^a-zA-Z0-9+])/, '$1{');
@@ -229,12 +229,34 @@ function handleClickApiEndpointTemplate(this: HTMLElement, event:MouseEvent) {  
   console.log('handleClickApiEndpointTemplate')
   addEndpointTemplateToGETList((event.target as HTMLElement).innerText)  
 }
+
+
                             // handleClickGET is called by JS as handler and by my code! This could be a problem!
 async function handleClickGET(this: HTMLElement/*ignored*/, event:MouseEvent/*ignored*/, update_query_string=true) { 
   const endpoints_list = document.getElementById('endpoints_get_list') as HTMLOListElement
 
   const endpoint_spans = Array.from(endpoints_list.querySelectorAll('span.endpoint')) as HTMLSpanElement[]
   (<any>window).selected_URLs = endpoint_spans.map(span => `https://api.github.com${(span as HTMLElement).innerText.trim()}`) 
+
+  function flashContentAndCSSClass(element:HTMLElement, temp_content?:string, temp_css_class?:string, ms=1000) {
+    const original_text = element.innerHTML
+
+    if (temp_content) {
+      element.innerHTML = temp_content
+    }
+    if (temp_css_class) {
+      element.classList.add(temp_css_class);
+    }
+    setTimeout(()=>{
+      if (temp_content) {
+        element.innerHTML = original_text
+      }
+      if (temp_css_class) {
+        element.classList.remove(temp_css_class);
+      }
+    }, ms)
+  }
+
 
   try {
     // const errors = [];
@@ -477,6 +499,31 @@ function refreshEndpointsMenuContents(selected?:JsOb) {
       }
     }
 
+    /**
+     * @param {Node|string} child (optional) Node or html string to be added within new element
+     * @returns newly created HTMLUListElement
+     */
+     function ul(child:(string|HTMLElement|undefined)=undefined)  { // used in endpoints.ts
+      const node = document.createElement('ul');
+      if (typeof child === 'string')
+        node.insertAdjacentHTML('beforeend', child);
+      else if (child)
+        node.appendChild(child)
+      return node;
+    }
+
+    /**
+    * @param {Node|string} child (optional) Node or html string to be added within new element
+    * @returns newly created HTMLLIElement
+    */
+    function li(child:Node|string) { // used in endpoints.ts
+      const node = document.createElement('li')
+      if (typeof child === 'string')
+        node.insertAdjacentHTML('beforeend', child);
+      else if (child)
+        node.appendChild(child)
+      return node;
+    }
 
     let current_menu_li, current_menu_li_ul, 
         current_submenu_li, current_submenu_li_ul;
