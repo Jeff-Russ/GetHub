@@ -54,22 +54,23 @@
 //   // this must be called after endpointsMenuSettings is called (and endpointsMenuSettings.options are set)
 //   // and should not be called more than once!
 //   // About max_sorts: there are actually 4 possible (endpointsMenuSettings.options.Sort.length). TODO: try with 4
-//   const select:JsOb = {
-//     Sort_by: document.getElementById('Sort_by_select'),
-//     Sort_dir: document.getElementById('Sort_dir_select'),
-//     'Show.Category': document.getElementById('show_categories_select'),
-//     'Show.API': document.getElementById('show_apis_select'),
-//     'Show.Parameters.selections': document.getElementById('show_params_select'),
-//     'Show.Parameters.Require': document.getElementById('require_params_select'),
+//   const select:Record<string, HTMLSelectElement> = {
+//     Sort_by: <HTMLSelectElement>document.getElementById('Sort_by_select'), 
+//     Sort_dir: <HTMLSelectElement>document.getElementById('Sort_dir_select'), 
+//     'Show.Category': <HTMLSelectElement>document.getElementById('show_categories_select'),
+//     'Show.API': <HTMLSelectElement>document.getElementById('show_apis_select'),
+//     'Show.Parameters.selections': <HTMLSelectElement>document.getElementById('show_params_select'),
+//     'Show.Parameters.Require': <HTMLSelectElement>document.getElementById('require_params_select'),
 //   }
 //   appendSortOptions(max_sorts)
 //   appendShowOptions()
 //   for (const key in select) {
-//     select[key].addEventListener('change', (this: HTMLElement, event:Event) => {
-//       const htmlCollection = event.target.selectedOptions; // does not work with this.
+//     select[key].addEventListener('change', function(this:HTMLSelectElement, event:Event)  {
+//       // const htmlCollection = event.target.selectedOptions; // does not work with this (in JS)
+//       const htmlCollection = select[key].selectedOptions;
 //       let selected_obj:JsOb = {};
 //       if (htmlCollection) {
-//         let selected = [...htmlCollection].map(option_el => option_el.innerText)
+//         let selected = Array.from(htmlCollection).map(option_el => option_el.innerText)
 //         // get the right place in endpointsMenuSettings.selected 
 //         const ksplit = key.split('_') // to put selected_options:
 //         if (ksplit.length === 2) { // endpointsMenuSettings.selected['Sort']

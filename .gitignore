@@ -37,6 +37,8 @@ src/tests.ts
 public/medium_test.html
 src/medium_script.ts
 
+tests/
+
 
 ### VSCode & Extensions ###
 
